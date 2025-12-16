@@ -2,7 +2,7 @@
 
 client_id = "a492873797ea660dcb0de6d95d8d5bac"
 name = "whatsapp-mern-app"
-application_url = "https://example.com"
+application_url = "https://shopify-app-with-mern.onrender.com"
 embedded = true
 
 [build]
