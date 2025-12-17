@@ -3,7 +3,6 @@ import Loader from "../components/skeleton/loader";
 import { getAllPhone } from "../api/phone";
 
 export default function Phone() {
-
   const url = "/phone";
   const { error, data, isLoading } = useQuery({
     queryKey: ["phone"],
@@ -14,6 +13,7 @@ export default function Phone() {
     return <Loader />;
   }
   console.log("DATA: 🚀", data);
+
   return (
     <div>
       <h1>Phone list page</h1>
