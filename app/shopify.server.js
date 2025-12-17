@@ -35,6 +35,8 @@
 
 
 import "@shopify/shopify-app-react-router/adapters/node";
+import { MongoDBSessionStorage } from "@shopify/shopify-app-session-storage-mongodb";
+
 import { Session } from "@shopify/shopify-api";
 import {
   ApiVersion,
@@ -107,7 +109,11 @@ const shopify = shopifyApp({
   scopes: process.env.SCOPES?.split(","),
   appUrl: process.env.SHOPIFY_APP_URL || "",
   authPathPrefix: "/auth",
-  sessionStorage: mongoSessionStorage,
+  sessionStorage: new MongoDBSessionStorage(
+    process.env.MONGODB_URL,
+    process.env.DB_NAME,
+    {sessionCollectionName: "shopify_sessions"}
+  ),
   distribution: AppDistribution.AppStore,
   future: {
     expiringOfflineAccessTokens: true,
