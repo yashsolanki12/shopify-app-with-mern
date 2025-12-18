@@ -1,3 +1,5 @@
+import CircularProgress from "@mui/material/CircularProgress";
+
 import {
   Dialog,
   DialogTitle,
@@ -6,8 +8,6 @@ import {
   TextField,
   Button,
 } from "@mui/material";
-import CircularProgress from "@mui/material/CircularProgress";
-
 import { useEffect, useState } from "react";
 import { phoneSchema } from "../../validation/phone.schema";
 import { createPhone, editPhone } from "../../api/phone";
@@ -31,30 +31,32 @@ export default function PhoneModal(props) {
   const queryClient = useQueryClient();
 
   const handleSubmit = async () => {
-    const createPayload = {
-      ...form,
-      ...(sessionId && { shopify_session_id: sessionId }),
-    };
-    const editPayload = {
-      ...form,
-    };
-    const payload = editMode ? editPayload : createPayload;
-    // Zod validation
-    const result = phoneSchema.safeParse(form);
-    if (!result.success) {
-      const errors = {};
-
-      result.error.issues.forEach((issue) => {
-        if (issue.path[0]) {
-          errors[issue.path[0]] = issue.message;
-        }
-      });
-
-      setFormErrors(errors);
-      return;
-    }
-
     try {
+      const createPayload = {
+        ...form,
+        ...(sessionId && { shopify_session_id: sessionId }),
+      };
+      const editPayload = {
+        ...form,
+      };
+      const payload = editMode ? editPayload : createPayload;
+
+      // Zod validation
+      const result = phoneSchema.safeParse(form);
+      if (!result.success) {
+        const errors = {};
+
+        result.error.issues.forEach((issue) => {
+          if (issue.path[0]) {
+            errors[issue.path[0]] = issue.message;
+          }
+        });
+
+        setFormErrors(errors);
+        return;
+      }
+
+      // Create and Edit APi Integration
       let response;
       if (editMode) {
         response = await editPhone(selectedId, payload);

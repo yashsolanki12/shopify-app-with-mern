@@ -1,5 +1,8 @@
-import { useQuery } from "@tanstack/react-query";
+import PhoneModal from "../components/phone/phone-modal";
 import Loader from "../components/skeleton/loader";
+import PhoneList from "../components/phone/phone-list";
+
+import { useQuery } from "@tanstack/react-query";
 import {
   deletePhone,
   getAllPhone,
@@ -18,12 +21,11 @@ import {
 } from "@mui/material";
 import { Add } from "@mui/icons-material";
 import { useEffect, useState } from "react";
-import PhoneModal from "../components/phone/phone-modal";
-import PhoneList from "../components/phone/phone-list";
 import { useQueryClient } from "@tanstack/react-query";
 
 export default function PhoneListPage() {
   const initialForm = { phone_number: "", country_code: "" };
+
   const queryClient = useQueryClient();
   const [modalOpen, setModalOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
@@ -131,7 +133,7 @@ export default function PhoneListPage() {
           mb={3}
         >
           <Typography variant="h4" color="primary" fontWeight={700}>
-            Phone Management
+            Phone List
           </Typography>
           <Fab
             color="primary"
