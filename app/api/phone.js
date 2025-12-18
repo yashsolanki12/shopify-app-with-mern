@@ -1,4 +1,5 @@
 import axiosInstance from "./axiosInstance";
+import { useShopDomain } from "../utils/helper";
 
 // const getRequestHeaders = () => ({
 //   "Content-Type": "application/json",
@@ -8,11 +9,13 @@ import axiosInstance from "./axiosInstance";
 // });
 
 const getShopDomain = () => {
-  if (typeof window !== "undefined") {
-    const params = new URLSearchParams(window.location.search);
-    return params.get("shop") || "";
-  }
-  return "";
+  // if (typeof window !== "undefined") {
+  //   const params = new URLSearchParams(window.location.search);
+  //   return params.get("shop") || "";
+  // }
+  // return "";
+  const shop = useShopDomain();
+  return shop;
 };
 
 export const getAllPhone = async () => {
