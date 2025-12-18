@@ -1,10 +1,10 @@
 import { Suspense, lazy } from "react";
-const Phone = lazy(() => import("../pages/phone"));
+const PhoneListPage = lazy(() => import("../pages/phone-list-page"));
 
 export default function PhonePage() {
   return (
-    <Suspense fallback="Loading...">
-      <Phone />
+    <Suspense fallback="">
+      <PhoneListPage />
     </Suspense>
   );
 }
