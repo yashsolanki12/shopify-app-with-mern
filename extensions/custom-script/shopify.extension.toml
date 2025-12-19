@@ -1,0 +1,18 @@
+name = "whatsapp-mern"
+type = "theme"
+
+uid = "3e6b5859-58a8-5ca1-3e06-b1f1bcfd6eaa02406d74"
+handle = "whatsapp-script"
+
+[blocks]
+	[blocks.app-embed]
+	name = "App Embed Block"
+	target = "head"
+	file = "blocks/whatsapp-mern.liquid"
+
+
+
+# Optional: Add metafields if needed
+# [[extensions.metafields]]
+# namespace = "custom"
+# key = "scripts"

@@ -1,0 +1,131 @@
+{% comment %}
+  WhatsApp Button Block
+  Adds a floating WhatsApp button to the store
+{% endcomment %}
+
+{% if block.settings.enabled %}
+  <div class="whatsapp-button-wrapper">
+     <a id="whatsapp-link"
+       href="https://wa.me/{{ block.settings.phone_number | default: '' }}"
+       target="_blank"
+       rel="noopener noreferrer"
+       class="whatsapp-embed-logo"
+       title="Chat with us on WhatsApp">
+      <img src="{{ 'whatsapp.png' | asset_img_url }}" 
+          alt="WhatsApp" 
+          height="60px"
+          width="60px"
+          loading="lazy">
+     </a>
+  </div>
+
+  {{ 'whatsapp-logo.css' | asset_url | stylesheet_tag }}
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('WhatsApp button initialized');
+      
+      // Get shop domain from URL
+      function getShopDomain() {
+        if(typeof window !== 'undefined') {
+          const match = window.location.host
+          console.log('match',match)
+           return match 
+            // Return null if no match is found
+          }
+          return null;
+      }
+      
+      // REAL API CALL: Fetch phone number with dynamic shop domain header and update WhatsApp link
+      async function fetchPhoneNumberAndUpdateLink() {
+        const shopDomain = getShopDomain();
+        if (!shopDomain) {
+          console.error('Shop domain not found in URL');
+          return;
+        }
+        try {
+          const response = await fetch('https://whatsapp-mern-backend-sidn.onrender.com/api/phone', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-shopify-shop-domain': shopDomain
+            },
+            credentials: 'include'
+          });
+          const result = await response.json();
+          console.log('Phone API Response:', result);
+          const whatsappLink = document.getElementById('whatsapp-link');
+          if (result && Array.isArray(result.data) && result.data.length > 0) {
+            // Use map to process all phone records (for logging/demo)
+            const links = result.data.map((item, idx) => {
+              if (item.country_code && item.phone_number) {
+                const country = item.country_code.replace(/^\+/, '');
+                const phone = item.phone_number;
+                const waLink = `https://wa.me/${country}${phone}`;
+                console.log(`WhatsApp link for record ${idx}:`, waLink);
+                return waLink;
+              }
+              return null;
+            }).filter(Boolean);
+            // Set the first valid link to the button
+            if (links.length > 0) {
+              whatsappLink.href = links[0];
+              console.log('Updated WhatsApp link:', links[0]);
+
+              // Prevent link from opening in theme editor
+              if (window.Shopify && window.Shopify.designMode) {
+                whatsappLink.addEventListener('click', function(e) {
+                  e.preventDefault();
+                  alert('WhatsApp link preview is disabled in the theme editor. This will work on your live store.');
+                });
+              }
+              
+            } else {
+              console.error('No valid phone data found in API response.');
+            }
+          } else {
+            console.error('API did not return valid phone data');
+          }
+        } catch (error) {
+          console.error('Error calling phone API:', error);
+        }
+      }
+
+      // Call real API only if block is enabled
+      if ({{ block.settings.enabled | json }}) {
+        fetchPhoneNumberAndUpdateLink();
+      }
+      
+      // Listen for theme editor changes
+      if (window.Shopify && window.Shopify.designMode) {
+        // This will run in the theme editor
+        const toggleInput = document.querySelector('input[name*="[enabled]"]');
+        if (toggleInput) {
+          toggleInput.addEventListener('change', function() {
+            if (this.checked) {
+              updateWhatsAppLink();
+            }
+          });
+        }
+      }
+    });
+  </script>
+{% endif %}
+
+{% schema %}
+{
+  "name": "WhatsApp Button",
+  "target": "body",
+  
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "enabled",
+      "label": "Enable WhatsApp Button",
+      "default": true,
+      "info": "Toggle to show or hide the WhatsApp button"
+    }
+   
+  ]
+}
+{% endschema %}
+
