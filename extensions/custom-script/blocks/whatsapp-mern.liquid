@@ -71,13 +71,13 @@
               whatsappLink.href = links[0];
               console.log('Updated WhatsApp link:', links[0]);
 
-              // Prevent link from opening in theme editor
+              {% comment %} // Prevent link from opening in theme editor
               if (window.Shopify && window.Shopify.designMode) {
                 whatsappLink.addEventListener('click', function(e) {
                   e.preventDefault();
                   alert('WhatsApp link preview is disabled in the theme editor. This will work on your live store.');
                 });
-              }
+              } {% endcomment %}
               
             } else {
               console.error('No valid phone data found in API response.');
