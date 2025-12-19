@@ -135,15 +135,17 @@ export default function PhoneListPage() {
           <Typography variant="h4" color="primary" fontWeight={700}>
             Phone List
           </Typography>
-          <Fab
-            color="primary"
-            size="medium"
-            aria-label="add"
-            onClick={() => handleOpenModal()}
-            sx={{ boxShadow: 2 }}
-          >
-            <Add />
-          </Fab>
+          {data?.data.length >= 1 ? undefined : (
+            <Fab
+              color="primary"
+              size="medium"
+              aria-label="add"
+              onClick={() => handleOpenModal()}
+              sx={{ boxShadow: 2 }}
+            >
+              <Add />
+            </Fab>
+          )}
         </Box>
 
         {/* Phone List */}
