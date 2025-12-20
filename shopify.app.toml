@@ -2,7 +2,7 @@
 
 client_id = "a492873797ea660dcb0de6d95d8d5bac"
 name = "whatsapp-mern-app"
-application_url = "https://shopify-app-with-mern.onrender.com"
+application_url = "https://whatsapp-mern-web.onrender.com"
 embedded = true
 
 [build]
@@ -25,7 +25,7 @@ scopes = "write_products"
 
 [auth]
 redirect_urls = [
-    "https://shopify-app-with-mern.onrender.com/auth/callback",
-    "https://shopify-app-with-mern.onrender.com/auth/shopify/callback",
-    "https://shopify-app-with-mern.onrender.com/api/auth/callback"
+    "https://whatsapp-mern-web.onrender.com/auth/callback",
+    "https://whatsapp-mern-web.onrender.com/auth/shopify/callback",
+    "https://whatsapp-mern-web.onrender.com/api/auth/callback"
 ]
