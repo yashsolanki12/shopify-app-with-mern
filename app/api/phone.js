@@ -26,7 +26,7 @@ export const getAllPhone = async () => {
         "x-shopify-shop-domain": shopDomain,
       },
     })
-    .then((res) => res.data);
+    .then((res) => res.data)
 };
 
 export const deletePhone = async (id) => {
