@@ -81,12 +81,25 @@ export default function PhoneModal(props) {
             : String(error.response.data),
           severity: "error",
         });
+      } else if (error.response.data.message) {
+        setSnackbar({
+          open: true,
+          message: error.response.data.message,
+          severity: "error",
+        });
       }
     }
   };
 
   const formMutation = useMutation({
     mutationFn: handleSubmit,
+    onError: (error) => {
+      setSnackbar({
+        open: true,
+        message: error.message || "Failed to add phone",
+        severity: "error",
+      });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["phone"] });
     },
