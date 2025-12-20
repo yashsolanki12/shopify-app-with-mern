@@ -4,31 +4,39 @@
 {% endcomment %}
 
 {% if block.settings.enabled %}
-  <div class="whatsapp-button-wrapper">
-     <a id="whatsapp-link"
-       href="https://wa.me/{{ block.settings.phone_number | default: '' }}"
-       target="_blank"
-       rel="noopener noreferrer"
-       class="whatsapp-embed-logo"
-       title="Chat with us on WhatsApp">
+  <div class="whatsapp-button-wrapper" id="whatsapp-button-wrapper">
+        <div style="margin-top:10px;">
+          <label>Icon Position:</label>
+          <label style="margin-right:10px;"><input type="radio" name="whatsapp-position" value="left"> Left</label>
+          <label><input type="radio" name="whatsapp-position" value="right" checked> Right</label>
+        </div>
+    <a id="whatsapp-link"
+      href="https://wa.me/{{ block.settings.phone_number | default: '' }}"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="whatsapp-embed-logo"
+      title="Chat with us on WhatsApp">
       <img src="{{ 'whatsapp.png' | asset_img_url }}" 
-          alt="WhatsApp" 
-          height="60px"
-          width="60px"
-          loading="lazy">
-     </a>
+        alt="WhatsApp" 
+        height="60px"
+        width="60px"
+        loading="lazy">
+    </a>
+    <div style="margin-top:10px;">
+      <label for="whatsapp-message">Message</label>
+      <textarea id="whatsapp-message" maxLength=50 rows="2" style="width:100%;resize:none;"></textarea>
+    </div>
   </div>
 
   {{ 'whatsapp-logo.css' | asset_url | stylesheet_tag }}
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      console.log('WhatsApp button initialized');
-      
+    
+
       // Get shop domain from URL
       function getShopDomain() {
         if(typeof window !== 'undefined') {
           const match = window.location.host
-          console.log('match',match)
            return match 
             // Return null if no match is found
           }
@@ -52,33 +60,45 @@
             credentials: 'include'
           });
           const result = await response.json();
-          console.log('Phone API Response:', result);
           const whatsappLink = document.getElementById('whatsapp-link');
+          const messageInput = document.getElementById('whatsapp-message');
+          // Set default message from schema if available
+          if (messageInput) {
+            messageInput.value = "{{ block.settings.default_message | escape }}";
+          }
+          function updateWhatsAppLinkWithMessage(baseLink) {
+            let msg = messageInput ? messageInput.value.trim() : '';
+            if (msg.length > 0) {
+              // Encode message for URL
+              return `${baseLink}?text=${encodeURIComponent(msg)}`;
+            }
+            return baseLink;
+          }
           if (result && Array.isArray(result.data) && result.data.length > 0) {
-            // Use map to process all phone records (for logging/demo)
             const links = result.data.map((item, idx) => {
               if (item.country_code && item.phone_number) {
                 const country = item.country_code.replace(/^\+/, '');
                 const phone = item.phone_number;
                 const waLink = `https://wa.me/${country}${phone}`;
-                console.log(`WhatsApp link for record ${idx}:`, waLink);
                 return waLink;
               }
               return null;
             }).filter(Boolean);
-            // Set the first valid link to the button
             if (links.length > 0) {
-              whatsappLink.href = links[0];
-              console.log('Updated WhatsApp link:', links[0]);
-
-              {% comment %} // Prevent link from opening in theme editor
+              whatsappLink.href = updateWhatsAppLinkWithMessage(links[0]);
+              // Update link on message change
+              if (messageInput) {
+                messageInput.addEventListener('input', function() {
+                  whatsappLink.href = updateWhatsAppLinkWithMessage(links[0]);
+                });
+              }
+              // Prevent link from opening in theme editor
               if (window.Shopify && window.Shopify.designMode) {
                 whatsappLink.addEventListener('click', function(e) {
                   e.preventDefault();
                   alert('WhatsApp link preview is disabled in the theme editor. This will work on your live store.');
                 });
-              } {% endcomment %}
-              
+              }
             } else {
               console.error('No valid phone data found in API response.');
             }
@@ -90,9 +110,40 @@
         }
       }
 
+      // Set icon position based on radio selection
+      function setIconPosition() {
+        let wrapper = document.getElementById('whatsapp-button-wrapper');
+        let whatsappLink = document.getElementById('whatsapp-link');
+        let radios = document.getElementsByName('whatsapp-position');
+        if (!wrapper || !whatsappLink || !radios) return;
+        // Helper to update icon position
+        function updateIconPosition(position) {
+          // Remove both left/right styles first
+          whatsappLink.style.right = '';
+          whatsappLink.style.left = '';
+          whatsappLink.style.position = 'fixed';
+          whatsappLink.style.bottom = '30px';
+          if (position === 'left') {
+            whatsappLink.style.left = '30px';
+          } else {
+            whatsappLink.style.right = '30px';
+          }
+        }
+        // Set initial position from block.settings.icon_position
+        let initial = '{{ block.settings.icon_position | escape }}' || 'right';
+        updateIconPosition(initial);
+        // Set radio button checked state
+        radios.forEach(function(radio) {
+          radio.checked = radio.value === initial;
+          radio.addEventListener('change', function() {
+            if (this.checked) updateIconPosition(this.value);
+          });
+        });
+      }
       // Call real API only if block is enabled
       if ({{ block.settings.enabled | json }}) {
         fetchPhoneNumberAndUpdateLink();
+        setIconPosition();
       }
       
       // Listen for theme editor changes
@@ -123,8 +174,25 @@
       "label": "Enable WhatsApp Button",
       "default": true,
       "info": "Toggle to show or hide the WhatsApp button"
+    },
+    {
+      "type": "textarea",
+      "id": "default_message",
+      "label": "Default WhatsApp Message",
+      "default": "Hey, ",
+      "info": "Default message for WhatsApp chat"
+    },
+    {
+      "type": "radio",
+      "id": "icon_position",
+      "label": "WhatsApp Icon Position",
+      "default": "right",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ],
+      "info": "Set the position of the WhatsApp icon (left or right)"
     }
-   
   ]
 }
 {% endschema %}
