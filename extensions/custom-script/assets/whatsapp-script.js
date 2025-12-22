@@ -83,7 +83,7 @@ function initWhatsAppButton() {
       // Use a default/test phone number if not set
       let phone = whatsappLogo.getAttribute("data-phone");
       if (!phone || phone === "") {
-        phone = "918141040917"; // <-- Set your default/test phone number here
+        phone = "91 8128587898"; // <-- Set your default/test phone number here
       }
       let waUrl = "https://wa.me/" + phone;
       if (msg.length > 0) {
