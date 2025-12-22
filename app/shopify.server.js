@@ -28,6 +28,20 @@ const shopify = shopifyApp({
     : {}),
 });
 
+export async function registerAppUninstalledWebhook(session) {
+  const response = await shopify.webhook.register({
+    session,
+    topic: "APP_UNINSTALLED",
+    address: "https://whatsapp-mern-backend.onrender.com/api/shopify/webhook",
+    format: "json",
+  });
+  if (response.success) {
+    console.log("Webhook registered successfully");
+  } else {
+    console.error("Failed to register webhook", response.result);
+  }
+}
+
 export default shopify;
 export const apiVersion = ApiVersion.October25;
 export const addDocumentResponseHeaders = shopify.addDocumentResponseHeaders;
