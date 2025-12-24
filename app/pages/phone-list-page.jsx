@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from "react";
+import { Suspense, lazy } from "react";
 const PhoneModal = lazy(() => import("../components/phone/phone-modal"));
 import Loader from "../components/skeleton/loader";
 import PhoneList from "../components/phone/phone-list";
