@@ -52,6 +52,8 @@ function initWhatsAppButton() {
     const img = document.createElement("img");
     img.src = "/extension/custom-script/assets/whatsapp.png";
     img.alt = "WhatsApp";
+    img.height = "60",
+    img.width = "60";
     img.loading = "lazy";
     whatsappLogo.appendChild(img);
 

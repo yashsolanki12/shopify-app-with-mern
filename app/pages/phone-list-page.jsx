@@ -1,4 +1,5 @@
-import PhoneModal from "../components/phone/phone-modal";
+import React, { Suspense, lazy } from "react";
+const PhoneModal = lazy(() => import("../components/phone/phone-modal"));
 import Loader from "../components/skeleton/loader";
 import PhoneList from "../components/phone/phone-list";
 
@@ -158,18 +159,20 @@ export default function PhoneListPage() {
       </Paper>
 
       {/* Phone Modal */}
-      <PhoneModal
-        modalOpen={modalOpen}
-        editMode={editMode}
-        form={form}
-        formErrors={formErrors}
-        setFormErrors={setFormErrors}
-        handleCloseModal={handleCloseModal}
-        handleChange={handleChange}
-        sessionData={sessionData}
-        setSnackbar={setSnackbar}
-        selectedId={selectedId}
-      />
+      <Suspense fallback={<Loader />}>
+        <PhoneModal
+          modalOpen={modalOpen}
+          editMode={editMode}
+          form={form}
+          formErrors={formErrors}
+          setFormErrors={setFormErrors}
+          handleCloseModal={handleCloseModal}
+          handleChange={handleChange}
+          sessionData={sessionData}
+          setSnackbar={setSnackbar}
+          selectedId={selectedId}
+        />
+      </Suspense>
 
       <Snackbar
         open={snackbar.open}
