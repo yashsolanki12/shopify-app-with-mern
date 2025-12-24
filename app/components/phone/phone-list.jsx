@@ -51,13 +51,21 @@ export default function PhoneList(props) {
             </TableCell>
           </TableRow>
         </TableHead>
-        <TableBody>
-          {data?.map((phone) => (
-            <TableRow key={phone._id}>
-              <TableCell>{phone.country_code}</TableCell>
-              <TableCell>{phone.phone_number}</TableCell>
-              <TableCell align="right" sx={{ display: "flex" }}>
-                <Suspense fallback={<CircularProgress size={20} />}>
+        <Suspense
+          fallback={
+            <TableRow>
+              <TableCell colSpan={3} align="center">
+                <CircularProgress size={20} />
+              </TableCell>
+            </TableRow>
+          }
+        >
+          <TableBody>
+            {data?.map((phone) => (
+              <TableRow key={phone._id}>
+                <TableCell>{phone.country_code}</TableCell>
+                <TableCell>{phone.phone_number}</TableCell>
+                <TableCell align="right" sx={{ display: "flex" }}>
                   <ConfirmDialog
                     title="Confirm Phone Deletion"
                     description="Are you sure you want to delete this phone number? This action cannot be undone."
@@ -69,26 +77,27 @@ export default function PhoneList(props) {
                       <Delete />
                     </IconButton>
                   </ConfirmDialog>
-                </Suspense>
-                <IconButton
-                  color="primary"
-                  onClick={() => handleOpenModal(phone)}
-                  size="small"
-                >
-                  <Edit />
-                </IconButton>
-              </TableCell>
-            </TableRow>
-          ))}
 
-          {data?.length === 0 && (
-            <TableRow>
-              <TableCell colSpan={3} align="center">
-                <NoPhonesCard />
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
+                  <IconButton
+                    color="primary"
+                    onClick={() => handleOpenModal(phone)}
+                    size="small"
+                  >
+                    <Edit />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            ))}
+
+            {data?.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={3} align="center">
+                  <NoPhonesCard />
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Suspense>
       </Table>
 
       {/* Snackbar for API messages */}
