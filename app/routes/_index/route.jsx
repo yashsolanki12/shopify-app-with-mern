@@ -16,12 +16,10 @@ export default function App() {
   const { showForm } = useLoaderData();
 
   return (
-    <div className={styles.index}>
-      <div className={styles.content}>
-        <h1 className={styles.heading}>A short heading about [your app]</h1>
-        <p className={styles.text}>
-          A tagline about [your app] that describes your value proposition.
-        </p>
+    <div style={{ color: "black" }}>
+      <div>
+        <h1>A short heading about [your app]</h1>
+        <p>A tagline about [your app] that describes your value proposition.</p>
         {showForm && (
           <Form className={styles.form} method="post" action="/auth/login">
             <label className={styles.label}>

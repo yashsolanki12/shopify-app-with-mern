@@ -7,13 +7,14 @@ import {
   TableCell,
   IconButton,
   Snackbar,
+  CircularProgress,
 } from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
-import ConfirmDialog from "../ui/ConfirmDialog/confirm-dialog";
 import NoPhonesCard from "./no-phone-found";
 import MuiAlert from "@mui/material/Alert";
+import { useEffect, useState, Suspense, lazy } from "react";
 
-import { useEffect, useState } from "react";
+const ConfirmDialog = lazy(() => import("../ui/ConfirmDialog/confirm-dialog"));
 
 export default function PhoneList(props) {
   const { data, handleOpenModal, handleDelete, message } = props;
@@ -56,17 +57,19 @@ export default function PhoneList(props) {
               <TableCell>{phone.country_code}</TableCell>
               <TableCell>{phone.phone_number}</TableCell>
               <TableCell align="right" sx={{ display: "flex" }}>
-                <ConfirmDialog
-                  title="Confirm Phone Deletion"
-                  description="Are you sure you want to delete this phone number? This action cannot be undone."
-                  confirmText="Delete"
-                  cancelText="Cancel"
-                  onConfirm={() => handleDelete(phone._id)}
-                >
-                  <IconButton color="error" size="small">
-                    <Delete />
-                  </IconButton>
-                </ConfirmDialog>
+                <Suspense fallback={<CircularProgress size={20} />}>
+                  <ConfirmDialog
+                    title="Confirm Phone Deletion"
+                    description="Are you sure you want to delete this phone number? This action cannot be undone."
+                    confirmText="Delete"
+                    cancelText="Cancel"
+                    onConfirm={() => handleDelete(phone._id)}
+                  >
+                    <IconButton color="error" size="small">
+                      <Delete />
+                    </IconButton>
+                  </ConfirmDialog>
+                </Suspense>
                 <IconButton
                   color="primary"
                   onClick={() => handleOpenModal(phone)}
