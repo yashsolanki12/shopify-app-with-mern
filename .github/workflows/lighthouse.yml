@@ -20,5 +20,5 @@ jobs:
         uses: shopify/lighthouse-ci-action@v1
         env:
           SHOP_STORE: ${{ secrets.SHOP_STORE }}
-          SHOPIFY_CLI_AUTH_TOKEN: ${{ secrets.SHOP_ADMIN_API_TOKEN }}
+          SHOP_APP_PASSWORD: ${{ secrets.SHOP_APP_PASSWORD }}
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
