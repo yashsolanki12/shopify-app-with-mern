@@ -22,4 +22,5 @@ jobs:
           SHOP_ACCESS_TOKEN: ${{ secrets.SHOP_ACCESS_TOKEN }}
           SHOP_STORE: ${{ secrets.SHOP_STORE }}
           SHOP_APP_PASSWORD: ${{ secrets.SHOP_APP_PASSWORD }}
+          SHOP_APP_ID: ${{ secrets.SHOP_APP_ID }}
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
