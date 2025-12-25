@@ -1,6 +1,6 @@
 import { Suspense, lazy } from "react";
 const PhoneModal = lazy(() => import("../components/phone/phone-modal"));
-import Loader from "../components/skeleton/loader";
+const Loader = lazy(() => import("../components/skeleton/loader"));
 import PhoneList from "../components/phone/phone-list";
 
 import { useQuery } from "@tanstack/react-query";
@@ -20,7 +20,7 @@ import {
   Alert,
   Box,
 } from "@mui/material";
-import { Add } from "@mui/icons-material";
+import AddIcon from "@mui/icons-material/Add";
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -121,7 +121,7 @@ export default function PhoneListPage() {
   }, [getData]);
 
   if (isLoading) {
-    return <Loader />;
+    return <Suspense fallback={<Loader />}></Suspense>;
   }
 
   return (
@@ -144,12 +144,13 @@ export default function PhoneListPage() {
               onClick={() => handleOpenModal()}
               sx={{ boxShadow: 2 }}
             >
-              <Add />
+              <AddIcon />
             </Fab>
           )}
         </Box>
 
         {/* Phone List */}
+
         <PhoneList
           data={data?.data}
           handleOpenModal={handleOpenModal}

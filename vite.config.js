@@ -1,6 +1,7 @@
 import { reactRouter } from "@react-router/dev/vite";
 import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
+import { visualizer } from "rollup-plugin-visualizer";
 
 // Related: https://github.com/remix-run/remix/issues/2835#issuecomment-1144102176
 // Replace the HOST env var with SHOPIFY_APP_URL so that it doesn't break the Vite server.
@@ -44,13 +45,32 @@ export default defineConfig({
     port: Number(process.env.PORT || 3000),
     hmr: hmrConfig,
     fs: {
-      // See https://vitejs.dev/config/server-options.html#server-fs-allow for more information
       allow: ["app", "node_modules"],
     },
   },
   plugins: [reactRouter(), tsconfigPaths()],
   build: {
     assetsInlineLimit: 0,
+    minify: "esbuild",
+    rollupOptions: {
+      // plugins: [visualizer({ open: true })],
+      output: {
+        manualChunks(id) {
+          if (id.includes("node_modules")) {
+            if (id.includes("@mui")) return "mui";
+            if (id.includes("@shopify")) return "shopify";
+            if (id.includes("react-router")) return "react-router";
+            if (id.includes("@tanstack")) return "react-query";
+            return "vendor";
+          }
+          if (id.includes("phone-list")) return "phone-list";
+          if (id.includes("phone-modal")) return "phone-modal";
+          if (id.includes("confirm-dialog")) return "confirm-dialog";
+          if (id.includes("loader")) return "loader";
+          // Add more feature splits as needed
+        },
+      },
+    },
   },
   optimizeDeps: {
     include: ["@shopify/app-bridge-react"],

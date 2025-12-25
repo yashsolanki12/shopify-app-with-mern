@@ -1,5 +1,5 @@
 import { Paper, Typography, Box } from "@mui/material";
-import { PhoneDisabled } from "@mui/icons-material"; 
+import PhoneDisabled from "@mui/icons-material/PhoneDisabled";
 
 function NoPhonesCard() {
   return (
@@ -7,7 +7,7 @@ function NoPhonesCard() {
       display="flex"
       justifyContent="center"
       alignItems="center"
-      minHeight="30vh" 
+      minHeight="30vh"
     >
       <Paper
         elevation={3}
@@ -18,7 +18,7 @@ function NoPhonesCard() {
           maxWidth: 400,
           textAlign: "center",
           boxShadow: 3,
-          transition: "box-shadow 0.3s ease-in-out", 
+          transition: "box-shadow 0.3s ease-in-out",
           ":hover": {
             boxShadow: 6,
           },
