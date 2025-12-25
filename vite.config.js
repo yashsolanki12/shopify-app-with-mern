@@ -53,7 +53,7 @@ export default defineConfig({
     assetsInlineLimit: 0,
     minify: "esbuild",
     rollupOptions: {
-      plugins: [visualizer({ open: true })],
+      // plugins: [visualizer({ open: true })],
       output: {
         manualChunks(id) {
           if (id.includes("node_modules")) {
