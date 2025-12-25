@@ -14,6 +14,21 @@ export default async function handleRequest(
   reactRouterContext,
 ) {
   addDocumentResponseHeaders(request, responseHeaders);
+
+  // Enable HTTP caching for better performance
+  responseHeaders.set("Cache-Control", "public, max-age=3600, stale-while-revalidate=86400");
+
+  // Add resource hints for critical resources
+  responseHeaders.set("Link", [
+    "<https://cdn.shopify.com>; rel=preconnect; crossorigin",
+  ].join(", "));
+
+  // // Add early hints for critical resources
+  responseHeaders.set("Link", [
+    "<https://cdn.shopify.com>; rel=preconnect; crossorigin",
+    "<https://cdn.shopify.com/static/fonts/inter/v4/styles.css>; rel=preload; as=style",
+  ].join(", "));
+
   const userAgent = request.headers.get("user-agent");
   const callbackName = isbot(userAgent ?? "") ? "onAllReady" : "onShellReady";
 
