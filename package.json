@@ -12,6 +12,7 @@
     "env": "shopify app env",
     "docker-start": "npm run start",
     "start": "react-router-serve ./build/server/index.js",
+    "prestart": "npx prisma generate",
     "setup": "prisma generate && prisma migrate deploy",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
     "shopify": "shopify",
