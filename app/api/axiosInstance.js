@@ -1,7 +1,15 @@
 import axios from "axios";
 
-const backEndUrl = "https://whatsapp-mern-backend-sidn.onrender.com/api/";
-// const backEndUrl = "https://unstimulating-semistiff-thuy.ngrok-free.dev/api/";
+// Dynamically set baseURL for local and production
+let backEndUrl;
+if (typeof window !== "undefined" && window.location.hostname === "localhost") {
+  // Local development
+  backEndUrl = "https://whatsapp-mern-backend-sidn.onrender.com/api/";
+} else {
+  // Production/Shopify live (proxy path)
+  backEndUrl =
+    "https://whatsapp-mern-backend-sidn.onrender.com/apps/whatsapp-mern-app/";
+}
 
 const axiosInstance = axios.create({
   baseURL: backEndUrl,
