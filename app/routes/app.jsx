@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Outlet, useLoaderData, useRouteError } from "react-router";
 import { boundary } from "@shopify/shopify-app-react-router/server";
 import { AppProvider } from "@shopify/shopify-app-react-router/react";
@@ -13,8 +14,25 @@ export const loader = async ({ request }) => {
 export default function App() {
   const { apiKey } = useLoaderData();
 
+  // Create QueryClient once and memoize it to prevent SSR issues
+  const queryClient = useMemo(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: 1000 * 60 * 5, // 5 minutes
+            gcTime: 1000 * 60 * 10, // 10 minutes (formerly cacheTime)
+            refetchOnWindowFocus: false,
+            // Disable queries during SSR
+            enabled: typeof window !== "undefined",
+          },
+        },
+      }),
+    [],
+  );
+
   return (
-    <QueryClientProvider client={new QueryClient()}>
+    <QueryClientProvider client={queryClient}>
       <AppProvider embedded apiKey={apiKey}>
         {/* <s-app-nav>
           <s-link href="/app/phone">Phone</s-link>
