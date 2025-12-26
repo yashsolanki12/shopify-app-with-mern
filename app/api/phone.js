@@ -1,5 +1,5 @@
 import axiosInstance from "./axiosInstance";
-import { useShopDomain } from "../utils/helper";
+// import { useShopDomain } from "../utils/helper";
 
 // const getRequestHeaders = () => ({
 //   "Content-Type": "application/json",
@@ -9,13 +9,16 @@ import { useShopDomain } from "../utils/helper";
 // });
 
 const getShopDomain = () => {
-  // if (typeof window !== "undefined") {
-  //   const params = new URLSearchParams(window.location.search);
-  //   return params.get("shop") || "";
-  // }
-  // return "";
-  const shop = useShopDomain();
-  return shop;
+  // Get shop domain from URL parameters (works in both client and server)
+  if (typeof window !== "undefined") {
+    const params = new URLSearchParams(window.location.search);
+    console.log("params", params.get("shop"));
+    return params.get("shop") || "";
+  }
+  return "";
+
+  //  const shop = useShopDomain();
+  //  return shop;
 };
 
 export const getAllPhone = async () => {
@@ -26,7 +29,7 @@ export const getAllPhone = async () => {
         "x-shopify-shop-domain": shopDomain,
       },
     })
-    .then((res) => res.data)
+    .then((res) => res.data);
 };
 
 export const deletePhone = async (id) => {
