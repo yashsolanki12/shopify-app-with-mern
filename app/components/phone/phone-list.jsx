@@ -67,7 +67,15 @@ export default function PhoneList(props) {
                 <TableCell>{phone.country_code}</TableCell>
                 <TableCell>{phone.phone_number}</TableCell>
                 <TableCell align="right" sx={{ display: "flex" }}>
-                  <Suspense fallback={null}>
+                  <Suspense
+                    fallback={
+                      <TableRow>
+                        <TableCell colSpan={3} align="center">
+                          <CircularProgress size={20} />
+                        </TableCell>
+                      </TableRow>
+                    }
+                  >
                     <ConfirmDialog
                       title="Confirm Phone Deletion"
                       description="Are you sure you want to delete this phone number? This action cannot be undone."

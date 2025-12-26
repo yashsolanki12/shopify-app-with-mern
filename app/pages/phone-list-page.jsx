@@ -1,6 +1,5 @@
 import { Suspense, lazy } from "react";
-const PhoneModal = lazy(() => import("../components/phone/phone-modal"));
-const Loader = lazy(() => import("../components/skeleton/loader"));
+import Loader from "../components/skeleton/loader";
 import PhoneList from "../components/phone/phone-list";
 
 import { useQuery } from "@tanstack/react-query";
@@ -11,18 +10,18 @@ import {
   getPhone,
 } from "../api/phone";
 
-import {
-  Container,
-  Typography,
-  Paper,
-  Fab,
-  Snackbar,
-  Alert,
-  Box,
-} from "@mui/material";
+import Container from "@mui/material/Container";
+import Typography from "@mui/material/Typography";
+import Paper from "@mui/material/Paper";
+import Fab from "@mui/material/Fab";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
+import Box from "@mui/material/Box";
 import AddIcon from "@mui/icons-material/Add";
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+
+const PhoneModal = lazy(() => import("../components/phone/phone-modal"));
 
 export default function PhoneListPage() {
   const initialForm = { phone_number: "", country_code: "" };
@@ -121,7 +120,7 @@ export default function PhoneListPage() {
   }, [getData]);
 
   if (isLoading) {
-    return <Suspense fallback={<Loader />}></Suspense>;
+    return <Loader />;
   }
 
   return (
@@ -160,7 +159,7 @@ export default function PhoneListPage() {
       </Paper>
 
       {/* Phone Modal */}
-      <Suspense fallback={<Loader />}>
+      <Suspense fallback={<Box sx={{ minHeight: 200 }} />}>
         <PhoneModal
           modalOpen={modalOpen}
           editMode={editMode}
