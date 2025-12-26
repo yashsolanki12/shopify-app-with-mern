@@ -24,10 +24,10 @@ export default async function handleRequest(
   ].join(", "));
 
   // // Add early hints for critical resources
-  responseHeaders.set("Link", [
-    "<https://cdn.shopify.com>; rel=preconnect; crossorigin",
-    "<https://cdn.shopify.com/static/fonts/inter/v4/styles.css>; rel=preload; as=style",
-  ].join(", "));
+  // responseHeaders.set("Link", [
+  //   "<https://cdn.shopify.com>; rel=preconnect; crossorigin",
+  //   "<https://cdn.shopify.com/static/fonts/inter/v4/styles.css>; rel=preload; as=style",
+  // ].join(", "));
 
   const userAgent = request.headers.get("user-agent");
   const callbackName = isbot(userAgent ?? "") ? "onAllReady" : "onShellReady";
