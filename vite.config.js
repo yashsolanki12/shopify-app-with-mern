@@ -52,6 +52,9 @@ export default defineConfig({
   build: {
     assetsInlineLimit: 0,
     minify: "esbuild",
+    cssMinify: true,
+    cssCodeSplit: true,
+    reportCompressedSize: false, // Faster builds
     rollupOptions: {
       // plugins: [visualizer({ open: true })],
       output: {
@@ -61,18 +64,24 @@ export default defineConfig({
             if (id.includes("@shopify")) return "shopify";
             if (id.includes("react-router")) return "react-router";
             if (id.includes("@tanstack")) return "react-query";
+            if (id.includes("@emotion")) return "emotion";
+            if (id.includes("react") || id.includes("react-dom")) return "react-vendor";
             return "vendor";
           }
-          if (id.includes("phone-list")) return "phone-list";
-          if (id.includes("phone-modal")) return "phone-modal";
-          if (id.includes("confirm-dialog")) return "confirm-dialog";
-          if (id.includes("loader")) return "loader";
-          // Add more feature splits as needed
         },
+        chunkFileNames: "assets/[name]-[hash].js",
+        entryFileNames: "assets/[name]-[hash].js",
+        assetFileNames: "assets/[name]-[hash].[ext]",
       },
     },
   },
   optimizeDeps: {
-    include: ["@shopify/app-bridge-react"],
+    include: [
+      "@shopify/app-bridge-react",
+      "@mui/material",
+      "@mui/icons-material",
+      "react",
+      "react-dom",
+    ],
   },
 });
