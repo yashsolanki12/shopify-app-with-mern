@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import { Outlet, useLoaderData, useRouteError } from "react-router";
 import { boundary } from "@shopify/shopify-app-react-router/server";
 import { AppProvider } from "@shopify/shopify-app-react-router/react";
@@ -13,20 +12,6 @@ export const loader = async ({ request }) => {
 
 export default function App() {
   const { apiKey } = useLoaderData();
-
-  const queryClient = useMemo(
-    () =>
-      new QueryClient({
-        defaultOptions: {
-          queries: {
-            staleTime: 1000 * 60 * 5, // 5 minutes
-            cacheTime: 1000 * 60 * 10, // 10 minutes
-            refetchOnWindowFocus: false,
-          },
-        },
-      }),
-    [],
-  );
 
   return (
     <QueryClientProvider client={new QueryClient()}>

@@ -16,12 +16,12 @@ export default async function handleRequest(
   addDocumentResponseHeaders(request, responseHeaders);
 
   // Enable HTTP caching for better performance
-  responseHeaders.set("Cache-Control", "public, max-age=3600, stale-while-revalidate=86400");
+  // responseHeaders.set("Cache-Control", "public, max-age=3600, stale-while-revalidate=86400");
 
-  // Add resource hints for critical resources
-  responseHeaders.set("Link", [
-    "<https://cdn.shopify.com>; rel=preconnect; crossorigin",
-  ].join(", "));
+  // // Add resource hints for critical resources
+  // responseHeaders.set("Link", [
+  //   "<https://cdn.shopify.com>; rel=preconnect; crossorigin",
+  // ].join(", "));
 
   // // Add early hints for critical resources
   // responseHeaders.set("Link", [
