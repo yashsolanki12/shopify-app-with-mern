@@ -8,9 +8,23 @@
     <!-- WhatsApp Icon and Text -->
     <div class="whatsapp-toggle-container" id="whatsapp-container">
       <a id="whatsapp-main-link" href="#" target="_blank" rel="noopener noreferrer" class="whatsapp-toggle-icon" title="Chat with us on WhatsApp">
-        <img src="{{ 'whatsapp.png' | asset_img_url }}" alt="WhatsApp" height="60px" width="60px">
+        {% case block.settings.custom_icon %}
+          {% when 'chat1' %}
+            <img src="{{ 'chat-icon-1.svg' | asset_url }}" alt="Chat" height="60px" width="60px">
+          {% when 'chat2' %}
+            <img src="{{ 'chat-icon-2.svg' | asset_url }}" alt="Chat" height="60px" width="60px">
+          {% when 'chat3' %}
+            <img src="{{ 'chat-icon-3.svg' | asset_url }}" alt="Chat" height="60px" width="60px">
+          {% else %}
+            <img src="{{ 'whatsapp.png' | asset_url }}" alt="WhatsApp" height="60px" width="60px">
+        {% endcase %}
       </a>
-      <span class="whatsapp-toggle-text" id="whatsapp-text" style="display: {% if block.settings.show_text %}inline-block{% else %}none{% endif %};">WhatsApp us</span>
+        <a id="whatsapp-link"
+        href="https://wa.me/{{ block.settings.phone_number | default: '' }}"
+        target="_blank"
+        rel="noopener noreferrer">
+      <span class="whatsapp-toggle-text" id="whatsapp-text" style="display: {% if block.settings.button_style == 'icon_with_text' %}inline-block{% else %}none{% endif %};">WhatsApp us</span>
+      </a>
     </div>
     
     <!-- WhatsApp Widget (hidden by default) -->
@@ -19,7 +33,9 @@
         <label><input type="checkbox" id="show-text-toggle"> Show icon with text</label>
       </div>
       <div style="margin-bottom:10px;">
-        <label>Icon Position:</label>
+        {% comment %}
+          <label>Icon Position:</label>
+        {% endcomment %}
         <label style="margin-right:10px;"><input type="radio" name="whatsapp-position" value="left"> Left</label>
         <label><input type="radio" name="whatsapp-position" value="right" checked> Right</label>
       </div>
@@ -29,11 +45,16 @@
         rel="noopener noreferrer"
         class="whatsapp-embed-logo"
         title="Chat with us on WhatsApp">
-        <img src="{{ 'whatsapp.png' | asset_img_url }}" 
-          alt="WhatsApp" 
-          height="60px"
-          width="60px"
-          loading="lazy">
+        {% case block.settings.custom_icon %}
+          {% when 'chat1' %}
+            <img src="{{ 'chat-icon-1.svg' | asset_url }}" alt="Chat" height="60px" width="60px" loading="lazy">
+          {% when 'chat2' %}
+            <img src="{{ 'chat-icon-2.svg' | asset_url }}" alt="Chat" height="60px" width="60px" loading="lazy">
+          {% when 'chat3' %}
+            <img src="{{ 'chat-icon-3.svg' | asset_url }}" alt="Chat" height="60px" width="60px" loading="lazy">
+          {% else %}
+            <img src="{{ 'whatsapp.png' | asset_url }}" alt="WhatsApp" height="60px" width="60px" loading="lazy">
+        {% endcase %}
       </a>
       <div style="margin-top:10px;">
         <label for="whatsapp-message">Message</label>
@@ -155,7 +176,7 @@
         
         // Toggle text visibility
         if (showTextToggle && textElement) {
-          showTextToggle.checked = {{ block.settings.show_text | json }};
+          showTextToggle.checked = {{ block.settings.button_style | json }} === 'icon_with_text';
           showTextToggle.addEventListener('change', function() {
             textElement.style.display = this.checked ? 'inline-block' : 'none';
           });
@@ -226,11 +247,19 @@
       "info": "Toggle to show or hide the WhatsApp button"
     },
     {
-      "type": "checkbox",
-      "id": "show_text",
-      "label": "Show icon with text",
-      "default": false,
-      "info": "Show 'WhatsApp us' text next to the icon"
+      "type": "header",
+      "content": "Theme Design"
+    },
+    {
+      "type": "radio",
+      "id": "button_style",
+      "label": "Button Style",
+      "default": "icon_only",
+      "options": [
+        { "value": "icon_only", "label": "Button With Icon" },
+        { "value": "icon_with_text", "label": "Button With Text and Icon" }
+      ],
+      "info": "Choose button display style"
     },
     {
       "type": "textarea",
@@ -240,9 +269,30 @@
       "info": "Default message for WhatsApp chat"
     },
     {
+      "type": "header",
+      "content": "Custom Icon Selection"
+    },
+    {
+      "type": "radio",
+      "id": "custom_icon",
+      "label": "Choose Icon",
+      "default": "whatsapp",
+      "options": [
+        { "value": "whatsapp", "label": "WhatsApp (Default)" },
+        { "value": "chat1", "label": "Chat Icon 1" },
+        { "value": "chat2", "label": "Chat Icon 2" },
+        { "value": "chat3", "label": "Chat Icon 3" }
+      ],
+      "info": "Select which icon to display"
+    },
+    {
+      "type": "header",
+      "content": "Position"
+    },
+    {
       "type": "radio",
       "id": "icon_position",
-      "label": "WhatsApp Icon Position",
+      "label": "Button position",
       "default": "right",
       "options": [
         { "value": "left", "label": "Left" },
