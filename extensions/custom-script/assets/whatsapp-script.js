@@ -81,6 +81,7 @@ function initWhatsAppButton() {
 
     // Update WhatsApp link with textarea value on click
     whatsappLogo.addEventListener("click", function (e) {
+      e.preventDefault();
       const msg = textarea.value.trim();
       // Use a default/test phone number if not set
       let phone = whatsappLogo.getAttribute("data-phone");
