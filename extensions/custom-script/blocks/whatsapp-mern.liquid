@@ -5,26 +5,40 @@
 
 {% if block.settings.enabled %}
   <div class="whatsapp-button-wrapper" id="whatsapp-button-wrapper">
-        <div style="margin-top:10px;">
-          <label>Icon Position:</label>
-          <label style="margin-right:10px;"><input type="radio" name="whatsapp-position" value="left"> Left</label>
-          <label><input type="radio" name="whatsapp-position" value="right" checked> Right</label>
-        </div>
-    <a id="whatsapp-link"
-      href="https://wa.me/{{ block.settings.phone_number | default: '' }}"
-      target="_blank"
-      rel="noopener noreferrer"
-      class="whatsapp-embed-logo"
-      title="Chat with us on WhatsApp">
-      <img src="{{ 'whatsapp.png' | asset_img_url }}" 
-        alt="WhatsApp" 
-        height="60px"
-        width="60px"
-        loading="lazy">
-    </a>
-    <div style="margin-top:10px;">
-      <label for="whatsapp-message">Message</label>
-      <textarea id="whatsapp-message" maxLength=50 rows="2" style="width:100%;resize:none;"></textarea>
+    <!-- WhatsApp Icon and Text -->
+    <div class="whatsapp-toggle-container" id="whatsapp-container">
+      <a id="whatsapp-main-link" href="#" target="_blank" rel="noopener noreferrer" class="whatsapp-toggle-icon" title="Chat with us on WhatsApp">
+        <img src="{{ 'whatsapp.png' | asset_img_url }}" alt="WhatsApp" height="60px" width="60px">
+      </a>
+      <span class="whatsapp-toggle-text" id="whatsapp-text" style="display: {% if block.settings.show_text %}inline-block{% else %}none{% endif %};">WhatsApp us</span>
+    </div>
+    
+    <!-- WhatsApp Widget (hidden by default) -->
+    <div id="whatsapp-widget" class="whatsapp-widget" style="display: none;">
+      <div style="margin-bottom:10px;">
+        <label><input type="checkbox" id="show-text-toggle"> Show icon with text</label>
+      </div>
+      <div style="margin-bottom:10px;">
+        <label>Icon Position:</label>
+        <label style="margin-right:10px;"><input type="radio" name="whatsapp-position" value="left"> Left</label>
+        <label><input type="radio" name="whatsapp-position" value="right" checked> Right</label>
+      </div>
+      <a id="whatsapp-link"
+        href="https://wa.me/{{ block.settings.phone_number | default: '' }}"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="whatsapp-embed-logo"
+        title="Chat with us on WhatsApp">
+        <img src="{{ 'whatsapp.png' | asset_img_url }}" 
+          alt="WhatsApp" 
+          height="60px"
+          width="60px"
+          loading="lazy">
+      </a>
+      <div style="margin-top:10px;">
+        <label for="whatsapp-message">Message</label>
+        <textarea id="whatsapp-message" maxLength=50 rows="2" style="width:100%;resize:none;"></textarea>
+      </div>
     </div>
   </div>
 
@@ -61,6 +75,7 @@
           });
           const result = await response.json();
           const whatsappLink = document.getElementById('whatsapp-link');
+          const whatsappMainLink = document.getElementById('whatsapp-main-link');
           const messageInput = document.getElementById('whatsapp-message');
           // Set default message from schema if available
           if (messageInput) {
@@ -85,18 +100,28 @@
               return null;
             }).filter(Boolean);
             if (links.length > 0) {
-              whatsappLink.href = updateWhatsAppLinkWithMessage(links[0]);
-              // Update link on message change
+              // Update both links
+              const finalLink = updateWhatsAppLinkWithMessage(links[0]);
+              if (whatsappLink) whatsappLink.href = finalLink;
+              if (whatsappMainLink) whatsappMainLink.href = finalLink;
+              
+              // Update links on message change
               if (messageInput) {
                 messageInput.addEventListener('input', function() {
-                  whatsappLink.href = updateWhatsAppLinkWithMessage(links[0]);
+                  const updatedLink = updateWhatsAppLinkWithMessage(links[0]);
+                  if (whatsappLink) whatsappLink.href = updatedLink;
+                  if (whatsappMainLink) whatsappMainLink.href = updatedLink;
                 });
               }
-              // Prevent link from opening in theme editor
+              // Prevent links from opening in theme editor
               if (window.Shopify && window.Shopify.designMode) {
-                whatsappLink.addEventListener('click', function(e) {
-                  e.preventDefault();
-                  alert('WhatsApp link preview is disabled in the theme editor. This will work on your live store.');
+                [whatsappLink, whatsappMainLink].forEach(link => {
+                  if (link) {
+                    link.addEventListener('click', function(e) {
+                      e.preventDefault();
+                      alert('WhatsApp link preview is disabled in the theme editor. This will work on your live store.');
+                    });
+                  }
                 });
               }
             } else {
@@ -110,29 +135,52 @@
         }
       }
 
+      // Toggle functionality
+      function initToggle() {
+        const container = document.getElementById('whatsapp-container');
+        const widget = document.getElementById('whatsapp-widget');
+        const textElement = document.getElementById('whatsapp-text');
+        const showTextToggle = document.getElementById('show-text-toggle');
+        const mainLink = document.getElementById('whatsapp-main-link');
+        let isWidgetVisible = false;
+        
+        // Right-click on container to show/hide widget
+        if (container && widget) {
+          container.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            isWidgetVisible = !isWidgetVisible;
+            widget.style.display = isWidgetVisible ? 'block' : 'none';
+          });
+        }
+        
+        // Toggle text visibility
+        if (showTextToggle && textElement) {
+          showTextToggle.checked = {{ block.settings.show_text | json }};
+          showTextToggle.addEventListener('change', function() {
+            textElement.style.display = this.checked ? 'inline-block' : 'none';
+          });
+        }
+      }
+      
       // Set icon position based on radio selection
       function setIconPosition() {
-        let wrapper = document.getElementById('whatsapp-button-wrapper');
-        let whatsappLink = document.getElementById('whatsapp-link');
+        let container = document.getElementById('whatsapp-container');
         let radios = document.getElementsByName('whatsapp-position');
-        if (!wrapper || !whatsappLink || !radios) return;
-        // Helper to update icon position
+        if (!container || !radios) return;
+        
         function updateIconPosition(position) {
-          // Remove both left/right styles first
-          whatsappLink.style.right = '';
-          whatsappLink.style.left = '';
-          whatsappLink.style.position = 'fixed';
-          whatsappLink.style.bottom = '30px';
+          container.style.right = '';
+          container.style.left = '';
           if (position === 'left') {
-            whatsappLink.style.left = '30px';
+            container.style.left = '30px';
           } else {
-            whatsappLink.style.right = '30px';
+            container.style.right = '30px';
           }
         }
-        // Set initial position from block.settings.icon_position
+        
         let initial = '{{ block.settings.icon_position | escape }}' || 'right';
         updateIconPosition(initial);
-        // Set radio button checked state
+        
         radios.forEach(function(radio) {
           radio.checked = radio.value === initial;
           radio.addEventListener('change', function() {
@@ -140,10 +188,12 @@
           });
         });
       }
+      
       // Call real API only if block is enabled
       if ({{ block.settings.enabled | json }}) {
         fetchPhoneNumberAndUpdateLink();
         setIconPosition();
+        initToggle();
       }
       
       // Listen for theme editor changes
@@ -174,6 +224,13 @@
       "label": "Enable WhatsApp Button",
       "default": true,
       "info": "Toggle to show or hide the WhatsApp button"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_text",
+      "label": "Show icon with text",
+      "default": false,
+      "info": "Show 'WhatsApp us' text next to the icon"
     },
     {
       "type": "textarea",
