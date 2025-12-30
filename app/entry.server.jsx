@@ -5,7 +5,7 @@ import { createReadableStreamFromReadable } from "@react-router/node";
 import { isbot } from "isbot";
 import { addDocumentResponseHeaders } from "./shopify.server";
 
-export const streamTimeout = 5000;
+export const streamTimeout = 10000;
 
 export default async function handleRequest(
   request,
@@ -50,11 +50,12 @@ export default async function handleRequest(
           pipe(body);
         },
         onShellError(error) {
+          console.error('Shell rendering error:', error);
           reject(error);
         },
         onError(error) {
           responseStatusCode = 500;
-          console.error(error);
+          console.error('React rendering error:', error);
         },
       },
     );
