@@ -9,6 +9,7 @@ import {
   Snackbar,
   CircularProgress,
 } from "@mui/material";
+import PropTypes from "prop-types";
 import NoPhonesCard from "./no-phone-found";
 import MuiAlert from "@mui/material/Alert";
 import { useEffect, useState, Suspense, lazy } from "react";
@@ -67,15 +68,7 @@ export default function PhoneList(props) {
                 <TableCell>{phone.country_code}</TableCell>
                 <TableCell>{phone.phone_number}</TableCell>
                 <TableCell align="right" sx={{ display: "flex" }}>
-                  <Suspense
-                    fallback={
-                      <TableRow>
-                        <TableCell colSpan={3} align="center">
-                          <CircularProgress size={20} />
-                        </TableCell>
-                      </TableRow>
-                    }
-                  >
+                  <Suspense fallback={<CircularProgress size={20} />}>
                     <ConfirmDialog
                       title="Confirm Phone Deletion"
                       description="Are you sure you want to delete this phone number? This action cannot be undone."
@@ -124,3 +117,10 @@ export default function PhoneList(props) {
     </TableContainer>
   );
 }
+
+PhoneList.propTypes = {
+  data: PropTypes.array,
+  handleOpenModal: PropTypes.func.isRequired,
+  handleDelete: PropTypes.func.isRequired,
+  message: PropTypes.object,
+};
