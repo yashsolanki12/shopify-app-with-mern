@@ -37,6 +37,9 @@ if (host === "localhost") {
 }
 
 export default defineConfig({
+  resolve: {
+    dedupe: ["react", "react-dom"],
+  },
   server: {
     allowedHosts: [host],
     cors: {
@@ -60,12 +63,14 @@ export default defineConfig({
       output: {
         manualChunks(id) {
           if (id.includes("node_modules")) {
+            if (id.includes("react") || id.includes("react-dom")) {
+              return "react-vendor";
+            }
             if (id.includes("@mui")) return "mui";
             if (id.includes("@shopify")) return "shopify";
             if (id.includes("react-router")) return "react-router";
             if (id.includes("@tanstack")) return "react-query";
             if (id.includes("@emotion")) return "emotion";
-            if (id.includes("react") || id.includes("react-dom")) return "react-vendor";
             return "vendor";
           }
         },
@@ -77,11 +82,12 @@ export default defineConfig({
   },
   optimizeDeps: {
     include: [
+      "react",
+      "react-dom",
       "@shopify/app-bridge-react",
       "@mui/material",
       "@mui/icons-material",
-      "react",
-      "react-dom",
     ],
+    force: true,
   },
 });
