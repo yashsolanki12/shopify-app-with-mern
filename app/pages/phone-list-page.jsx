@@ -1,7 +1,5 @@
-import { Suspense, lazy } from "react";
 import Loader from "../components/skeleton/loader";
 import PhoneList from "../components/phone/phone-list";
-import DebugInfo from "../components/debug/debug-info";
 
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -19,25 +17,25 @@ import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import AddIcon from "@mui/icons-material/Add";
-import { useEffect, useState } from "react";
+import React from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
-const PhoneModal = lazy(() => import("../components/phone/phone-modal"));
+const PhoneModal = React.lazy(() => import("../components/phone/phone-modal"));
 
 export default function PhoneListPage() {
   const initialForm = { phone_number: "", country_code: "" };
 
   const queryClient = useQueryClient();
-  const [modalOpen, setModalOpen] = useState(false);
-  const [editMode, setEditMode] = useState(false);
-  const [form, setForm] = useState(initialForm);
-  const [snackbar, setSnackbar] = useState({
+  const [modalOpen, setModalOpen] = React.useState(false);
+  const [editMode, setEditMode] = React.useState(false);
+  const [form, setForm] = React.useState(initialForm);
+  const [snackbar, setSnackbar] = React.useState({
     open: false,
     message: "",
     severity: "success",
   });
-  const [formErrors, setFormErrors] = useState({});
-  const [selectedId, setSelectedId] = useState("");
+  const [formErrors, setFormErrors] = React.useState({});
+  const [selectedId, setSelectedId] = React.useState("");
 
   // Phone list
   const { error, data, isLoading } = useQuery({
@@ -126,7 +124,7 @@ export default function PhoneListPage() {
     }));
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (getData?.data) {
       setForm({
         phone_number: getData?.data.phone_number,
@@ -142,9 +140,6 @@ export default function PhoneListPage() {
   if (error) {
     console.error("Phone list error:", error);
   }
-
-  console.log("Phone list data:", data);
-  console.log("Session data:", sessionData);
 
   return (
     <Container maxWidth="md" sx={{ py: 2 }}>
@@ -179,18 +174,18 @@ export default function PhoneListPage() {
           handleDelete={handleDelete}
           message={data}
         />
-        
-        {/* Debug Information */}
+
+        {/* Debug Information
         <DebugInfo 
           data={data} 
           sessionData={sessionData} 
           error={error} 
           sessionError={sessionError} 
-        />
+        /> */}
       </Paper>
 
       {/* Phone Modal */}
-      <Suspense fallback={<Box sx={{ minHeight: 200 }} />}>
+      <React.Suspense fallback={<Box sx={{ minHeight: 200 }} />}>
         <PhoneModal
           modalOpen={modalOpen}
           editMode={editMode}
@@ -203,7 +198,7 @@ export default function PhoneListPage() {
           setSnackbar={setSnackbar}
           selectedId={selectedId}
         />
-      </Suspense>
+      </React.Suspense>
 
       <Snackbar
         open={snackbar.open}

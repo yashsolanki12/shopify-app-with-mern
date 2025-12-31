@@ -6,18 +6,15 @@ const getShopDomain = () => {
   // if (typeof window !== "undefined") {
   //   const params = new URLSearchParams(window.location.search);
   //   const shop = params.get("shop");
-  //   console.log("Shop domain from URL:", shop);
   //   return shop || "";
   // }
   // return "";
   const app = currentShopDomain();
-  console.log("App Shop Domain:", app);
   return app;
 };
 
 export const getAllPhone = async () => {
   const shopDomain = getShopDomain();
-  console.log("Making API call with shop domain:", shopDomain);
 
   if (!shopDomain) {
     console.error("No shop domain found in URL parameters");
@@ -55,7 +52,6 @@ export const editPhone = async (id, data) => {
 
 export const getCurrentSession = async () => {
   const shopDomain = getShopDomain();
-  console.log("Getting current session for shop:", shopDomain);
 
   if (!shopDomain) {
     console.error("No shop domain found for session request");
