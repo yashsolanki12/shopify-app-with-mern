@@ -17,19 +17,8 @@ const isEmbedded = () => {
 const getBaseURL = () => {
   const backendDomain = "https://whatsapp-mern-backend-sidn.onrender.com";
 
-  // During SSR, window is undefined, so default to /api
-  if (typeof window === "undefined") {
-    return `${backendDomain}/api`;
-  }
-
-  // If embedded in Shopify, use the app proxy route
-  if (isEmbedded()) {
-    console.log("🔵 Embedded mode detected - using /apps/whatsapp-mern-app");
-    return `${backendDomain}/apps/whatsapp-mern-app`;
-  }
-
-  // For local development or direct access, use /api
-  console.log("🟢 Direct mode detected - using /api");
+  // Always use /api for consistency
+  console.log("🟢 Using /api endpoint");
   return `${backendDomain}/api`;
 };
 

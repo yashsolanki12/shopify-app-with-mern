@@ -1,6 +1,7 @@
 import { Suspense, lazy } from "react";
 import Loader from "../components/skeleton/loader";
 import PhoneList from "../components/phone/phone-list";
+import DebugInfo from "../components/debug/debug-info";
 
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -42,6 +43,16 @@ export default function PhoneListPage() {
   const { error, data, isLoading } = useQuery({
     queryKey: ["phone"],
     queryFn: () => getAllPhone(),
+    retry: 3,
+    retryDelay: 1000,
+    onError: (error) => {
+      console.error("Phone list query error:", error);
+      setSnackbar({
+        open: true,
+        message: error.message || "Failed to load phone list",
+        severity: "error",
+      });
+    },
   });
 
   const {
@@ -62,6 +73,11 @@ export default function PhoneListPage() {
   } = useQuery({
     queryKey: ["shopify-current-session"],
     queryFn: () => getCurrentSession(),
+    retry: 3,
+    retryDelay: 1000,
+    onError: (error) => {
+      console.error("Session query error:", error);
+    },
   });
 
   const handleOpenModal = (phone) => {
@@ -123,6 +139,13 @@ export default function PhoneListPage() {
     return <Loader />;
   }
 
+  if (error) {
+    console.error("Phone list error:", error);
+  }
+
+  console.log("Phone list data:", data);
+  console.log("Session data:", sessionData);
+
   return (
     <Container maxWidth="md" sx={{ py: 2 }}>
       <Paper elevation={4} sx={{ p: 4, borderRadius: 3 }}>
@@ -155,6 +178,14 @@ export default function PhoneListPage() {
           handleOpenModal={handleOpenModal}
           handleDelete={handleDelete}
           message={data}
+        />
+        
+        {/* Debug Information */}
+        <DebugInfo 
+          data={data} 
+          sessionData={sessionData} 
+          error={error} 
+          sessionError={sessionError} 
         />
       </Paper>
 
