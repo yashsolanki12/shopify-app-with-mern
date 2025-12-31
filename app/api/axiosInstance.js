@@ -14,12 +14,13 @@ const isEmbedded = () => {
 };
 
 // Determine the correct base URL based on environment
+
 const getBaseURL = () => {
   const backendDomain = "https://whatsapp-mern-backend-sidn.onrender.com";
 
   // Always use /api for consistency
   console.log("🟢 Using /api endpoint");
-  return `${backendDomain}/api`;
+  return `${backendDomain}/apps/whatsapp-mern-app/`;
 };
 
 const axiosInstance = axios.create({
