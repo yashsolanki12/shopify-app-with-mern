@@ -4,7 +4,7 @@ const PhoneListPage = lazy(() => import("../pages/phone-list-page"));
 
 export default function PhonePage() {
   return (
-    <Suspense fallback={"loading"}>
+    <Suspense fallback={""}>
       <PhoneListPage />
     </Suspense>
   );

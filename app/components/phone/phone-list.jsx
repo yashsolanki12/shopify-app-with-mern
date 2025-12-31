@@ -1,27 +1,25 @@
-import {
-  TableContainer,
-  TableHead,
-  TableRow,
-  Table,
-  TableBody,
-  TableCell,
-  IconButton,
-  Snackbar,
-  CircularProgress,
-} from "@mui/material";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import IconButton from "@mui/material/IconButton";
+import Snackbar from "@mui/material/Snackbar";
+import CircularProgress from "@mui/material/CircularProgress";
 import PropTypes from "prop-types";
 import NoPhonesCard from "./no-phone-found";
 import MuiAlert from "@mui/material/Alert";
-import { useEffect, useState, Suspense, lazy } from "react";
+import React from "react";
 import Edit from "@mui/icons-material/Edit";
 import Delete from "@mui/icons-material/Delete";
 
-const ConfirmDialog = lazy(() => import("../ui/ConfirmDialog/confirm-dialog"));
+import ConfirmDialog from "../ui/ConfirmDialog/confirm-dialog";
 
 export default function PhoneList(props) {
   const { data, handleOpenModal, handleDelete, message } = props;
 
-  const [phoneListMessage, setPhoneListMessage] = useState({
+  const [phoneListMessage, setPhoneListMessage] = React.useState({
     open: false,
     apiMessage: "",
     severity: "error",
@@ -31,7 +29,7 @@ export default function PhoneList(props) {
     setPhoneListMessage({ ...phoneListMessage, open: false });
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (message && message?.success == false) {
       setPhoneListMessage({
         open: true,
@@ -53,34 +51,33 @@ export default function PhoneList(props) {
             </TableCell>
           </TableRow>
         </TableHead>
-        <Suspense
-          fallback={
-            <TableRow>
-              <TableCell colSpan={3} align="center">
-                <CircularProgress size={20} />
-              </TableCell>
-            </TableRow>
-          }
-        >
-          <TableBody>
+
+        <TableBody>
+          <React.Suspense
+            fallback={
+              <TableRow>
+                <TableCell colSpan={3} align="center">
+                  <CircularProgress size={20} />
+                </TableCell>
+              </TableRow>
+            }
+          >
             {data?.map((phone) => (
               <TableRow key={phone._id}>
                 <TableCell>{phone.country_code}</TableCell>
                 <TableCell>{phone.phone_number}</TableCell>
                 <TableCell align="right" sx={{ display: "flex" }}>
-                  <Suspense fallback={<CircularProgress size={20} />}>
-                    <ConfirmDialog
-                      title="Confirm Phone Deletion"
-                      description="Are you sure you want to delete this phone number? This action cannot be undone."
-                      confirmText="Delete"
-                      cancelText="Cancel"
-                      onConfirm={() => handleDelete(phone._id)}
-                    >
-                      <IconButton color="error" size="small">
-                        <Delete />
-                      </IconButton>
-                    </ConfirmDialog>
-                  </Suspense>
+                  <ConfirmDialog
+                    title="Confirm Phone Deletion"
+                    description="Are you sure you want to delete this phone number? This action cannot be undone."
+                    confirmText="Delete"
+                    cancelText="Cancel"
+                    onConfirm={() => handleDelete(phone._id)}
+                  >
+                    <IconButton color="error" size="small">
+                      <Delete />
+                    </IconButton>
+                  </ConfirmDialog>
                   <IconButton
                     color="primary"
                     onClick={() => handleOpenModal(phone)}
@@ -99,8 +96,8 @@ export default function PhoneList(props) {
                 </TableCell>
               </TableRow>
             )}
-          </TableBody>
-        </Suspense>
+          </React.Suspense>
+        </TableBody>
       </Table>
 
       {/* Snackbar for API messages */}
