@@ -5,7 +5,7 @@ import { createReadableStreamFromReadable } from "@react-router/node";
 import { isbot } from "isbot";
 import { addDocumentResponseHeaders } from "./shopify.server";
 
-export const streamTimeout = 15000;
+export const streamTimeout = 5000;
 // 5000
 
 export default async function handleRequest(
@@ -34,15 +34,10 @@ export default async function handleRequest(
   const callbackName = isbot(userAgent ?? "") ? "onAllReady" : "onShellReady";
 
   return new Promise((resolve, reject) => {
-    let hasResolved = false;
-    
     const { pipe, abort } = renderToPipeableStream(
       <ServerRouter context={reactRouterContext} url={request.url} />,
       {
         [callbackName]: () => {
-          if (hasResolved) return;
-          hasResolved = true;
-          
           const body = new PassThrough();
           const stream = createReadableStreamFromReadable(body);
 
@@ -56,31 +51,17 @@ export default async function handleRequest(
           pipe(body);
         },
         onShellError(error) {
-          if (hasResolved) return;
-          hasResolved = true;
-          console.error("Shell error:", error);
           reject(error);
         },
         onError(error) {
           responseStatusCode = 500;
-          console.error("Render error:", error);
+          console.error(error);
         },
       },
     );
 
-    // Timeout with better error handling
-    const timeoutId = setTimeout(() => {
-      if (!hasResolved) {
-        console.log("Stream timeout reached, aborting render");
-        abort();
-      }
-    }, streamTimeout);
-    
-    // Clear timeout if resolved early
-    const originalResolve = resolve;
-    resolve = (...args) => {
-      clearTimeout(timeoutId);
-      originalResolve(...args);
-    };
+    // Automatically timeout the React renderer after 6 seconds, which ensures
+    // React has enough time to flush down the rejected boundary contents
+    setTimeout(abort, streamTimeout + 1000);
   });
 }
