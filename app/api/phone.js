@@ -35,7 +35,12 @@ export const getAllPhone = async () => {
 };
 
 export const deletePhone = async (id) => {
-  return axiosInstance.delete(`/phone/${id}`).then((res) => res.data);
+  return axiosInstance.delete(`/phone/${id}`)
+    .then((res) => res.data)
+    .catch((error) => {
+      console.error("API Error in deletePhone:", error);
+      throw error;
+    });
 };
 
 export const getPhone = async (id) => {
@@ -43,11 +48,21 @@ export const getPhone = async (id) => {
 };
 
 export const createPhone = async (data) => {
-  return axiosInstance.post("/phone/add", data).then((res) => res.data);
+  return axiosInstance.post("/phone/add", data)
+    .then((res) => res.data)
+    .catch((error) => {
+      console.error("API Error in createPhone:", error);
+      throw error;
+    });
 };
 
 export const editPhone = async (id, data) => {
-  return axiosInstance.put(`/phone/${id}`, data).then((res) => res.data);
+  return axiosInstance.put(`/phone/${id}`, data)
+    .then((res) => res.data)
+    .catch((error) => {
+      console.error("API Error in editPhone:", error);
+      throw error;
+    });
 };
 
 export const getCurrentSession = async () => {
