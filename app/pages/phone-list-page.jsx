@@ -1,41 +1,48 @@
+// import { Suspense, lazy } from "react";
 import Loader from "../components/skeleton/loader";
-import PhoneList from "../components/phone/phone-list";
+// import PhoneList from "../components/phone/phone-list";
 
 import { useQuery } from "@tanstack/react-query";
 import {
   deletePhone,
   getAllPhone,
   getCurrentSession,
-  getPhone,
+  // getPhone,
+  createPhone,
+  editPhone,
 } from "../api/phone";
 
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
-import Fab from "@mui/material/Fab";
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
+import Box from "@mui/material/Box";
+import Stack from "@mui/material/Stack";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
-import Box from "@mui/material/Box";
-import AddIcon from "@mui/icons-material/Add";
-import React from "react";
+import CircularProgress from "@mui/material/CircularProgress";
+import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
-const PhoneModal = React.lazy(() => import("../components/phone/phone-modal"));
+// const PhoneModal = lazy(() => import("../components/phone/phone-modal"));
 
 export default function PhoneListPage() {
   const initialForm = { phone_number: "", country_code: "" };
 
   const queryClient = useQueryClient();
-  const [modalOpen, setModalOpen] = React.useState(false);
-  const [editMode, setEditMode] = React.useState(false);
-  const [form, setForm] = React.useState(initialForm);
-  const [snackbar, setSnackbar] = React.useState({
+  // const [modalOpen, setModalOpen] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [form, setForm] = useState(initialForm);
+  const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
     severity: "success",
   });
-  const [formErrors, setFormErrors] = React.useState({});
-  const [selectedId, setSelectedId] = React.useState("");
+  // const [formErrors, setFormErrors] = useState({});
+  const [selectedId, setSelectedId] = useState("");
+  const [saveLoading, setSaveLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   // Phone list
   const { error, data, isLoading } = useQuery({
@@ -53,16 +60,6 @@ export default function PhoneListPage() {
     },
   });
 
-  const {
-    error: detailError,
-    data: getData,
-    isLoading: detailLoading,
-  } = useQuery({
-    queryKey: ["getPhone", selectedId],
-    queryFn: () => getPhone(selectedId),
-    enabled: !!selectedId,
-  });
-
   // Current Session
   const {
     error: sessionError,
@@ -78,28 +75,14 @@ export default function PhoneListPage() {
     },
   });
 
-  const handleOpenModal = (phone) => {
-    if (phone) {
-      setEditMode(true);
-      setSelectedId(phone._id);
-    } else {
-      setEditMode(false);
-      setForm(initialForm);
-      setSelectedId(null);
-    }
-    setModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setModalOpen(false);
-    setForm(initialForm);
-    setSelectedId(null);
-    setFormErrors({});
-  };
-
-  const handleDelete = async (row) => {
+  const handleSave = async () => {
+    setSaveLoading(true);
     try {
-      const response = await deletePhone(row);
+      const response = await createPhone({
+        phone_number: form.phone_number,
+        country_code: form.country_code,
+        shopify_session_id: sessionData?.session?._id,
+      });
       if (response) {
         setSnackbar({
           open: true,
@@ -107,98 +90,206 @@ export default function PhoneListPage() {
           severity: "success",
         });
         queryClient.invalidateQueries({ queryKey: ["phone"] });
+        setForm(initialForm);
       }
     } catch (error) {
+      const errorMessages = error.response?.data;
+      let message = "Failed to save phone";
+      
+      if (Array.isArray(errorMessages) && errorMessages.length > 0) {
+        message = errorMessages.join(" | ");
+      } else if (errorMessages?.message) {
+        message = errorMessages.message;
+      } else if (error.message) {
+        message = error.message;
+      }
+      
       setSnackbar({
         open: true,
-        message: error.message || "Failed to delete phone",
+        message,
         severity: "error",
       });
+    } finally {
+      setSaveLoading(false);
     }
   };
 
-  const handleChange = (field, value) => {
-    setForm((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
-
-  React.useEffect(() => {
-    if (getData?.data) {
+  const handleEdit = () => {
+    if (data?.data?.[0]) {
       setForm({
-        phone_number: getData?.data.phone_number,
-        country_code: getData?.data.country_code,
+        phone_number: data.data[0].phone_number,
+        country_code: data.data[0].country_code,
       });
+      setSelectedId(data.data[0]._id);
+      setEditMode(true);
     }
-  }, [getData]);
+  };
+
+  const handleUpdate = async () => {
+    setSaveLoading(true);
+    try {
+      const response = await editPhone(selectedId, {
+        phone_number: form.phone_number,
+        country_code: form.country_code,
+      });
+      if (response) {
+        setSnackbar({
+          open: true,
+          message: response.message,
+          severity: "success",
+        });
+        queryClient.invalidateQueries({ queryKey: ["phone"] });
+        setEditMode(false);
+        setForm(initialForm);
+      }
+    } catch (error) {
+      const errorMessages = error.response?.data;
+      let message = "Failed to update phone";
+      
+      if (Array.isArray(errorMessages) && errorMessages.length > 0) {
+        message = errorMessages.join(". ");
+      } else if (errorMessages?.message) {
+        message = errorMessages.message;
+      } else if (error.message) {
+        message = error.message;
+      }
+      
+      setSnackbar({
+        open: true,
+        message,
+        severity: "error",
+      });
+    } finally {
+      setSaveLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    setDeleteLoading(true);
+    try {
+      const response = await deletePhone(data.data[0]._id);
+      if (response) {
+        setSnackbar({
+          open: true,
+          message: response.message,
+          severity: "success",
+        });
+        queryClient.invalidateQueries({ queryKey: ["phone"] });
+        setEditMode(false);
+        setForm(initialForm);
+        setSelectedId("");
+      }
+    } catch (error) {
+      const errorMessages = error.response?.data;
+      let message = "Failed to delete phone";
+      
+      if (Array.isArray(errorMessages) && errorMessages.length > 0) {
+        message = errorMessages.join(". ");
+      } else if (errorMessages?.message) {
+        message = errorMessages.message;
+      } else if (error.message) {
+        message = error.message;
+      }
+      
+      setSnackbar({
+        open: true,
+        message,
+        severity: "error",
+      });
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
 
   if (isLoading) {
     return <Loader />;
   }
 
-  if (error) {
-    console.error("Phone list error:", error);
-  }
+  const hasPhone = data?.data && data.data.length > 0;
 
   return (
-    <Container maxWidth="md" sx={{ py: 2 }}>
+    <Container maxWidth="sm" sx={{ py: 4 }}>
       <Paper elevation={4} sx={{ p: 4, borderRadius: 3 }}>
-        <Box
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-          mb={3}
-        >
-          <Typography variant="h4" color="primary" fontWeight={700}>
-            Phone List
-          </Typography>
-          {data?.data.length >= 1 ? undefined : (
-            <Fab
-              color="primary"
-              size="medium"
-              aria-label="add"
-              onClick={() => handleOpenModal()}
-              sx={{ boxShadow: 2 }}
-            >
-              <AddIcon />
-            </Fab>
-          )}
-        </Box>
+        <Typography variant="h4" color="primary" fontWeight={700} mb={3} textAlign="center">
+          Phone Number
+        </Typography>
 
-        {/* Phone List */}
+        {hasPhone && !editMode ? (
+          <Stack spacing={3}>
+            <Paper sx={{ p: 3, bgcolor: "grey.50" }}>
+              <Typography variant="h6" gutterBottom>
+                Saved Phone Number:
+              </Typography>
+              <Typography variant="body1" sx={{ fontSize: "1.2rem" }}>
+                {data.data[0].country_code} {data.data[0].phone_number}
+              </Typography>
+            </Paper>
 
-        <PhoneList
-          data={data?.data}
-          handleOpenModal={handleOpenModal}
-          handleDelete={handleDelete}
-          message={data}
-        />
+            <Box display="flex" gap={2} justifyContent="center">
+              <Button 
+                variant="contained" 
+                color="primary" 
+                onClick={handleEdit}
+                disabled={saveLoading || deleteLoading}
+              >
+                Edit
+              </Button>
+              <Button 
+                variant="outlined" 
+                color="error" 
+                onClick={handleDelete}
+                disabled={saveLoading || deleteLoading}
+                startIcon={deleteLoading ? <CircularProgress size={20} /> : null}
+              >
+                Delete
+              </Button>
+            </Box>
+          </Stack>
+        ) : (
+          <Stack spacing={3}>
+            <TextField
+              fullWidth
+              label="Country Code"
+              value={form.country_code}
+              onChange={(e) => setForm(prev => ({ ...prev, country_code: e.target.value }))}
+              placeholder="e.g. +1, +91, +44"
+            />
 
-        {/* Debug Information
-        <DebugInfo 
-          data={data} 
-          sessionData={sessionData} 
-          error={error} 
-          sessionError={sessionError} 
-        /> */}
+            <TextField
+              fullWidth
+              label="Phone Number"
+              value={form.phone_number}
+              onChange={(e) => setForm(prev => ({ ...prev, phone_number: e.target.value }))}
+              placeholder="Enter phone number"
+              type="tel"
+            />
+
+            <Box display="flex" gap={2} justifyContent="center">
+              <Button 
+                variant="contained" 
+                color="primary" 
+                onClick={editMode ? handleUpdate : handleSave}
+                disabled={!form.phone_number.trim() || !form.country_code.trim() || saveLoading || deleteLoading}
+                startIcon={saveLoading ? <CircularProgress size={20} /> : null}
+              >
+                {editMode ? "Update" : "Save"}
+              </Button>
+              {editMode && (
+                <Button 
+                  variant="outlined" 
+                  onClick={() => {
+                    setEditMode(false);
+                    setForm(initialForm);
+                  }}
+                  disabled={saveLoading || deleteLoading}
+                >
+                  Cancel
+                </Button>
+              )}
+            </Box>
+          </Stack>
+        )}
       </Paper>
-
-      {/* Phone Modal */}
-      <React.Suspense fallback={<Box sx={{ minHeight: 200 }} />}>
-        <PhoneModal
-          modalOpen={modalOpen}
-          editMode={editMode}
-          form={form}
-          formErrors={formErrors}
-          setFormErrors={setFormErrors}
-          handleCloseModal={handleCloseModal}
-          handleChange={handleChange}
-          sessionData={sessionData}
-          setSnackbar={setSnackbar}
-          selectedId={selectedId}
-        />
-      </React.Suspense>
 
       <Snackbar
         open={snackbar.open}
