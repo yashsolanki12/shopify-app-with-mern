@@ -3,7 +3,7 @@
   Adds a floating WhatsApp button to the store
 {% endcomment %}
 
-{% if block.settings.enabled %}
+{% comment %} {% if block.settings.enabled %}
   <div class="whatsapp-button-wrapper" id="whatsapp-button-wrapper">
     <!-- WhatsApp Icon and Text -->
     <div class="whatsapp-toggle-container" id="whatsapp-container">
@@ -98,35 +98,50 @@
           const whatsappLink = document.getElementById('whatsapp-link');
           const whatsappMainLink = document.getElementById('whatsapp-main-link');
           const messageInput = document.getElementById('whatsapp-message');
-          // Set default message from schema if available
-          if (messageInput) {
-            messageInput.value = "{{ block.settings.default_message | escape }}";
-          }
-          function updateWhatsAppLinkWithMessage(baseLink) {
-            let msg = messageInput ? messageInput.value.trim() : '';
-            if (msg.length > 0) {
-              // Encode message for URL
-              return `${baseLink}?text=${encodeURIComponent(msg)}`;
-            }
-            return baseLink;
-          }
           if (result && Array.isArray(result.data) && result.data.length > 0) {
-            const links = result.data.map((item, idx) => {
+            const phoneData = result.data[0];
+            
+            // Prioritize settings from Database, fall back to schema settings
+            const apiMessage = phoneData.message;
+            const apiPosition = phoneData.position;
+            
+            if (messageInput && apiMessage !== undefined) {
+              messageInput.value = apiMessage;
+            } else {
+              messageInput.value = "{{ block.settings.default_message | escape }}";
+            }
+            
+            function updateWhatsAppLinkWithMessage(baseLink) {
+              let msg = messageInput ? messageInput.value.trim() : '';
+              if (msg.length > 0) {
+                return `${baseLink}?text=${encodeURIComponent(msg)}`;
+              }
+              return baseLink;
+            }
+
+            const links = result.data.map((item) => {
               if (item.country_code && item.phone_number) {
-                const country = item.country_code.replace(/^\+/, '');
-                const phone = item.phone_number;
-                const waLink = `https://wa.me/${country}${phone}`;
-                return waLink;
+                 // Robust formatting
+                const fullNumber = (item.country_code + item.phone_number).replace(/(\+)(?=\d)/g, "").replace(/\D/g, "");
+                return `https://wa.me/${fullNumber}`;
               }
               return null;
             }).filter(Boolean);
+
             if (links.length > 0) {
-              // Update both links
               const finalLink = updateWhatsAppLinkWithMessage(links[0]);
               if (whatsappLink) whatsappLink.href = finalLink;
               if (whatsappMainLink) whatsappMainLink.href = finalLink;
               
-              // Update links on message change
+              // Apply position from API or theme
+              const finalPosition = apiPosition || '{{ block.settings.icon_position | escape }}' || 'right';
+              const container = document.getElementById('whatsapp-container');
+              if (container) {
+                container.style.right = '';
+                container.style.left = '';
+                container.style[finalPosition] = '30px';
+              }
+
               if (messageInput) {
                 messageInput.addEventListener('input', function() {
                   const updatedLink = updateWhatsAppLinkWithMessage(links[0]);
@@ -231,47 +246,15 @@
       }
     });
   </script>
-{% endif %}
+{% endif %} {% endcomment %}
 
-{% schema %}
-{
-  "name": "TapTalk",
-  "target": "body",
-  
-  "settings": [
-    {
-      "type": "checkbox",
-      "id": "enabled",
-      "label": "Enable WhatsApp Button",
-      "default": true,
-      "info": "Toggle to show or hide the WhatsApp button"
-    },
-    {
-      "type": "header",
-      "content": "Theme Design"
-    },
-    {
-      "type": "radio",
-      "id": "button_style",
-      "label": "Button Style",
-      "default": "icon_only",
-      "options": [
-        { "value": "icon_only", "label": "Button With Icon" },
-        { "value": "icon_with_text", "label": "Button With Text and Icon" }
-      ],
-      "info": "Choose button display style"
-    },
-    {
-      "type": "textarea",
-      "id": "default_message",
-      "label": "Default WhatsApp Message",
-      "default": "Hey, ",
-      "info": "Default message for WhatsApp chat"
-    },
-    {
+
+{% comment %}
+   {
       "type": "header",
       "content": "Custom Icon Selection"
     },
+
     {
       "type": "radio",
       "id": "custom_icon",
@@ -285,6 +268,14 @@
       ],
       "info": "Select which icon to display"
     },
+     {
+      "type": "textarea",
+      "id": "default_message",
+      "label": "Default WhatsApp Message",
+      "default": "Hey, ",
+      "info": "Default message for WhatsApp chat"
+    },
+      
     {
       "type": "header",
       "content": "Position"
@@ -299,6 +290,38 @@
         { "value": "right", "label": "Right" }
       ],
       "info": "Set the position of the WhatsApp icon (left or right)"
+    }
+      {
+      "type": "header",
+      "content": "Theme Design"
+    },
+    
+    {
+      "type": "radio",
+      "id": "button_style",
+      "label": "Button Style",
+      "default": "icon_only",
+      "options": [
+        { "value": "icon_only", "label": "Button With Icon" },
+        { "value": "icon_with_text", "label": "Button With Text and Icon" }
+      ],
+      "info": "Choose button display style"
+    },
+   
+{% endcomment %}
+
+{% schema %}
+{
+  "name": "TapTalk",
+  "target": "body",
+  
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "enabled",
+      "label": "Enable WhatsApp Button",
+      "default": true,
+      "info": "Toggle to show or hide the WhatsApp button"
     }
   ]
 }

@@ -1,15 +1,14 @@
-// import { Suspense, lazy } from "react";
 import Loader from "../components/skeleton/loader";
-// import PhoneList from "../components/phone/phone-list";
+import WhatsAppSettings from "../components/whatsapp/whatsapp-settings";
+import WhatsAppIcon from "../components/whatsapp/whatsapp-icon";
 
 import { useQuery } from "@tanstack/react-query";
 import {
-  deletePhone,
   getAllPhone,
   getCurrentSession,
-  // getPhone,
   createPhone,
   editPhone,
+  // deletePhone,
 } from "../api/phone";
 
 import Container from "@mui/material/Container";
@@ -22,28 +21,39 @@ import Stack from "@mui/material/Stack";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import CircularProgress from "@mui/material/CircularProgress";
-import { useState } from "react";
+import React from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
 // const PhoneModal = lazy(() => import("../components/phone/phone-modal"));
 
-export default function PhoneListPage() {
+export default function PhoneListPage({
+  appEmbedEnabled = false,
+  initialSettings = {},
+}) {
   const initialForm = { phone_number: "", country_code: "" };
 
   const queryClient = useQueryClient();
-  // const [modalOpen, setModalOpen] = useState(false);
-  const [editMode, setEditMode] = useState(false);
-  const [form, setForm] = useState(initialForm);
-  const [snackbar, setSnackbar] = useState({
+  // ...
+  const [editMode, setEditMode] = React.useState(false);
+  const [form, setForm] = React.useState(initialForm);
+  const [snackbar, setSnackbar] = React.useState({
     open: false,
     message: "",
     severity: "success",
   });
-  // const [formErrors, setFormErrors] = useState({});
-  const [selectedId, setSelectedId] = useState("");
-  const [saveLoading, setSaveLoading] = useState(false);
-  const [deleteLoading, setDeleteLoading] = useState(false);
-
+  const [selectedId, setSelectedId] = React.useState("");
+  const [saveLoading, setSaveLoading] = React.useState(false);
+  // const [deleteLoading, setDeleteLoading] = React.useState(false);
+  const [iconPosition, setIconPosition] = React.useState(
+    initialSettings?.position || "right",
+  );
+  const [message, setMessage] = React.useState(initialSettings?.message || "");
+  const [buttonStyle, setButtonStyle] = React.useState(
+    initialSettings?.button_style || "icon_only",
+  );
+  const [customIcon, setCustomIcon] = React.useState(
+    initialSettings?.custom_icon || "whatsapp",
+  );
   // Phone list
   const { error, data, isLoading } = useQuery({
     queryKey: ["phone"],
@@ -59,6 +69,25 @@ export default function PhoneListPage() {
       });
     },
   });
+
+  React.useEffect(() => {
+    if (initialSettings && !data?.data?.[0]) {
+      setIconPosition(initialSettings.position || "right");
+      setMessage(initialSettings.message || "");
+      setButtonStyle(initialSettings.button_style || "icon_only");
+      setCustomIcon(initialSettings.custom_icon || "whatsapp");
+    }
+  }, [initialSettings, data]);
+
+  React.useEffect(() => {
+    if (data?.data?.[0]) {
+      const phoneData = data.data[0];
+      if (phoneData.position) setIconPosition(phoneData.position);
+      if (phoneData.message !== undefined) setMessage(phoneData.message);
+      if (phoneData.button_style) setButtonStyle(phoneData.button_style);
+      if (phoneData.custom_icon) setCustomIcon(phoneData.custom_icon);
+    }
+  }, [data]);
 
   // Current Session
   const {
@@ -78,11 +107,19 @@ export default function PhoneListPage() {
   const handleSave = async () => {
     setSaveLoading(true);
     try {
-      const response = await createPhone({
-        phone_number: form.phone_number,
-        country_code: form.country_code,
-        shopify_session_id: sessionData?.session?._id,
-      });
+      let response;
+      if (selectedId) {
+        response = await editPhone(selectedId, {
+          phone_number: form.phone_number,
+          country_code: form.country_code,
+        });
+      } else {
+        response = await createPhone({
+          phone_number: form.phone_number,
+          country_code: form.country_code,
+          shopify_session_id: sessionData?.session?._id,
+        });
+      }
       if (response) {
         setSnackbar({
           open: true,
@@ -90,12 +127,13 @@ export default function PhoneListPage() {
           severity: "success",
         });
         queryClient.invalidateQueries({ queryKey: ["phone"] });
+        setEditMode(false);
         setForm(initialForm);
       }
     } catch (error) {
       const errorMessages = error.response?.data;
       let message = "Failed to save phone";
-      
+
       if (Array.isArray(errorMessages) && errorMessages.length > 0) {
         message = errorMessages.join(" | ");
       } else if (errorMessages?.message) {
@@ -103,7 +141,7 @@ export default function PhoneListPage() {
       } else if (error.message) {
         message = error.message;
       }
-      
+
       setSnackbar({
         open: true,
         message,
@@ -115,102 +153,91 @@ export default function PhoneListPage() {
   };
 
   const handleEdit = () => {
-    if (data?.data?.[0]) {
-      setForm({
-        phone_number: data.data[0].phone_number,
-        country_code: data.data[0].country_code,
+    if (data?.data?.length > 0) {
+      data?.data?.map((ele) => {
+        setForm({
+          phone_number: ele.phone_number,
+          country_code: ele.country_code,
+        });
+        setSelectedId(ele._id);
       });
-      setSelectedId(data.data[0]._id);
       setEditMode(true);
     }
   };
 
-  const handleUpdate = async () => {
-    setSaveLoading(true);
-    try {
-      const response = await editPhone(selectedId, {
-        phone_number: form.phone_number,
-        country_code: form.country_code,
-      });
-      if (response) {
-        setSnackbar({
-          open: true,
-          message: response.message,
-          severity: "success",
-        });
-        queryClient.invalidateQueries({ queryKey: ["phone"] });
-        setEditMode(false);
-        setForm(initialForm);
-      }
-    } catch (error) {
-      const errorMessages = error.response?.data;
-      let message = "Failed to update phone";
-      
-      if (Array.isArray(errorMessages) && errorMessages.length > 0) {
-        message = errorMessages.join(". ");
-      } else if (errorMessages?.message) {
-        message = errorMessages.message;
-      } else if (error.message) {
-        message = error.message;
-      }
-      
-      setSnackbar({
-        open: true,
-        message,
-        severity: "error",
-      });
-    } finally {
-      setSaveLoading(false);
-    }
+  const handleSettingsUpdate = (newSettings) => {
+    setMessage(newSettings.message);
+    setIconPosition(newSettings.position);
+    setButtonStyle(newSettings.button_style);
+    setCustomIcon(newSettings.custom_icon);
+    setSnackbar({
+      open: true,
+      message: "WhatsApp settings updated successfully.",
+      severity: "success",
+    });
   };
 
-  const handleDelete = async () => {
-    setDeleteLoading(true);
-    try {
-      const response = await deletePhone(data.data[0]._id);
-      if (response) {
-        setSnackbar({
-          open: true,
-          message: response.message,
-          severity: "success",
-        });
-        queryClient.invalidateQueries({ queryKey: ["phone"] });
-        setEditMode(false);
-        setForm(initialForm);
-        setSelectedId("");
-      }
-    } catch (error) {
-      const errorMessages = error.response?.data;
-      let message = "Failed to delete phone";
-      
-      if (Array.isArray(errorMessages) && errorMessages.length > 0) {
-        message = errorMessages.join(". ");
-      } else if (errorMessages?.message) {
-        message = errorMessages.message;
-      } else if (error.message) {
-        message = error.message;
-      }
-      
-      setSnackbar({
-        open: true,
-        message,
-        severity: "error",
-      });
-    } finally {
-      setDeleteLoading(false);
-    }
+  const handleSettingsError = (errorMessage) => {
+    setSnackbar({
+      open: true,
+      message: errorMessage,
+      severity: "error",
+    });
   };
+
+  // const handleDelete = async () => {
+  //   setDeleteLoading(true);
+  //   try {
+  //     const response = await deletePhone(data.data[0]._id);
+  //     if (response) {
+  //       setSnackbar({
+  //         open: true,
+  //         message: response.message,
+  //         severity: "success",
+  //       });
+  //       queryClient.invalidateQueries({ queryKey: ["phone"] });
+  //       setEditMode(false);
+  //       setForm(initialForm);
+  //       setSelectedId("");
+  //     }
+  //   } catch (error) {
+  //     const errorMessages = error.response?.data;
+  //     let message = "Failed to delete phone";
+
+  //     if (Array.isArray(errorMessages) && errorMessages.length > 0) {
+  //       message = errorMessages.join(" | ");
+  //     } else if (errorMessages?.message) {
+  //       message = errorMessages.message;
+  //     } else if (error.message) {
+  //       message = error.message;
+  //     }
+
+  //     setSnackbar({
+  //       open: true,
+  //       message,
+  //       severity: "error",
+  //     });
+  //   } finally {
+  //     setDeleteLoading(false);
+  //   }
+  // };
+
+  const hasPhone = data?.data && data.data.length > 0;
 
   if (isLoading) {
     return <Loader />;
   }
 
-  const hasPhone = data?.data && data.data.length > 0;
-
   return (
     <Container maxWidth="sm" sx={{ py: 4 }}>
       <Paper elevation={4} sx={{ p: 4, borderRadius: 3 }}>
-        <Typography variant="h4" color="primary" fontWeight={700} mb={3} textAlign="center">
+        <Typography
+          variant="h4"
+          color="primary"
+          fontWeight={700}
+          mb={3}
+          textAlign="center"
+        >
           Phone Number
         </Typography>
 
@@ -226,23 +253,26 @@ export default function PhoneListPage() {
             </Paper>
 
             <Box display="flex" gap={2} justifyContent="center">
-              <Button 
-                variant="contained" 
-                color="primary" 
+              <Button
+                variant="contained"
+                color="primary"
                 onClick={handleEdit}
-                disabled={saveLoading || deleteLoading}
+                disabled={saveLoading } //|| deleteLoading
+                sx={{ textTransform: "none" }}
               >
                 Edit
               </Button>
-              <Button 
-                variant="outlined" 
-                color="error" 
+              {/* <Button
+                variant="outlined"
+                color="error"
                 onClick={handleDelete}
                 disabled={saveLoading || deleteLoading}
-                startIcon={deleteLoading ? <CircularProgress size={20} /> : null}
+                startIcon={
+                  deleteLoading ? <CircularProgress size={20} /> : null
+                }
               >
                 Delete
-              </Button>
+              </Button> */}
             </Box>
           </Stack>
         ) : (
@@ -251,7 +281,9 @@ export default function PhoneListPage() {
               fullWidth
               label="Country Code"
               value={form.country_code}
-              onChange={(e) => setForm(prev => ({ ...prev, country_code: e.target.value }))}
+              onChange={(e) =>
+                setForm((prev) => ({ ...prev, country_code: e.target.value }))
+              }
               placeholder="e.g. +1, +91, +44"
             />
 
@@ -259,29 +291,38 @@ export default function PhoneListPage() {
               fullWidth
               label="Phone Number"
               value={form.phone_number}
-              onChange={(e) => setForm(prev => ({ ...prev, phone_number: e.target.value }))}
+              onChange={(e) =>
+                setForm((prev) => ({ ...prev, phone_number: e.target.value }))
+              }
               placeholder="Enter phone number"
               type="tel"
             />
 
             <Box display="flex" gap={2} justifyContent="center">
-              <Button 
-                variant="contained" 
-                color="primary" 
-                onClick={editMode ? handleUpdate : handleSave}
-                disabled={!form.phone_number.trim() || !form.country_code.trim() || saveLoading || deleteLoading}
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={editMode ? handleSave : handleSave}
+                disabled={
+                  !form.phone_number.trim() ||
+                  !form.country_code.trim() ||
+                  saveLoading 
+                  // || deleteLoading
+                }
                 startIcon={saveLoading ? <CircularProgress size={20} /> : null}
+                sx={{ textTransform: "none" }}
               >
                 {editMode ? "Update" : "Save"}
               </Button>
               {editMode && (
-                <Button 
-                  variant="outlined" 
+                <Button
+                  variant="outlined"
                   onClick={() => {
                     setEditMode(false);
                     setForm(initialForm);
                   }}
-                  disabled={saveLoading || deleteLoading}
+                  disabled={saveLoading } // || deleteLoading
+                  sx={{ textTransform: "none" }}
                 >
                   Cancel
                 </Button>
@@ -290,6 +331,31 @@ export default function PhoneListPage() {
           </Stack>
         )}
       </Paper>
+
+      {/* WhatsApp Settings */}
+      {hasPhone && appEmbedEnabled && (
+        <WhatsAppSettings
+          phoneData={data.data}
+          initialSettings={{
+            position: iconPosition,
+            message: message,
+            button_style: buttonStyle,
+            custom_icon: customIcon,
+          }}
+          onSettingsUpdate={handleSettingsUpdate}
+          onError={handleSettingsError}
+        />
+      )}
+
+      {/* WhatsApp Floating Icon */}
+      <WhatsAppIcon
+        phoneData={hasPhone ? data.data : null}
+        message={message}
+        iconPosition={iconPosition}
+        buttonStyle={buttonStyle}
+        customIcon={customIcon}
+        appEmbedEnabled={appEmbedEnabled}
+      />
 
       <Snackbar
         open={snackbar.open}

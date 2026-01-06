@@ -11,19 +11,17 @@ automatically_update_urls_on_dev = true
 [webhooks]
 api_version = "2026-01"
 
-
-[[webhooks.subscriptions]]
-topics = [ "app/uninstalled" ]
-uri = "https://whatsapp-mern-backend-sidn.onrender.com/api/shopify/webhook"
-
+  [[webhooks.subscriptions]]
+  topics = [ "app/uninstalled" ]
+  uri = "https://whatsapp-mern-backend-sidn.onrender.com/api/shopify/webhook"
 
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
-scopes = "write_products"
+scopes = "write_products,read_themes"
 
 [auth]
 redirect_urls = [
-    "https://whatsapp-mern-web.onrender.com/auth/callback",
-    "https://whatsapp-mern-web.onrender.com/auth/shopify/callback",
-    "https://whatsapp-mern-web.onrender.com/api/auth/callback"
+  "https://whatsapp-mern-web.onrender.com/auth/callback",
+  "https://whatsapp-mern-web.onrender.com/auth/shopify/callback",
+  "https://whatsapp-mern-web.onrender.com/api/auth/callback"
 ]

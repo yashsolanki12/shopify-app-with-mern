@@ -14,7 +14,6 @@ import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import TextField from "@mui/material/TextField";
 import Select from "@mui/material/Select";
-import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import Button from "@mui/material/Button";
@@ -34,15 +33,6 @@ export default function PhoneListPage() {
   const [countryCode, setCountryCode] = React.useState("+1");
   const [isEditing, setIsEditing] = React.useState(false);
   const [savedData, setSavedData] = React.useState(null);
-
-  const countryCodes = [
-    { value: "+1", label: "+1 (US/Canada)" },
-    { value: "+44", label: "+44 (UK)" },
-    { value: "+91", label: "+91 (India)" },
-    { value: "+86", label: "+86 (China)" },
-    { value: "+49", label: "+49 (Germany)" },
-    { value: "+33", label: "+33 (France)" },
-  ];
 
   const handleSave = () => {
     if (phoneNumber.trim()) {
@@ -69,7 +59,13 @@ export default function PhoneListPage() {
   return (
     <Container maxWidth="sm" sx={{ py: 4 }}>
       <Paper elevation={4} sx={{ p: 4, borderRadius: 3 }}>
-        <Typography variant="h4" color="primary" fontWeight={700} mb={3} textAlign="center">
+        <Typography
+          variant="h4"
+          color="primary"
+          fontWeight={700}
+          mb={3}
+          textAlign="center"
+        >
           Phone Number
         </Typography>
 
@@ -81,13 +77,7 @@ export default function PhoneListPage() {
                 value={countryCode}
                 label="Country Code"
                 onChange={(e) => setCountryCode(e.target.value)}
-              >
-                {countryCodes.map((country) => (
-                  <MenuItem key={country.value} value={country.value}>
-                    {country.label}
-                  </MenuItem>
-                ))}
-              </Select>
+              ></Select>
             </FormControl>
 
             <TextField
@@ -100,19 +90,16 @@ export default function PhoneListPage() {
             />
 
             <Box display="flex" gap={2} justifyContent="center">
-              <Button 
-                variant="contained" 
-                color="primary" 
+              <Button
+                variant="contained"
+                color="primary"
                 onClick={handleSave}
                 disabled={!phoneNumber.trim()}
               >
                 {isEditing ? "Update" : "Save"}
               </Button>
               {isEditing && (
-                <Button 
-                  variant="outlined" 
-                  onClick={() => setIsEditing(false)}
-                >
+                <Button variant="outlined" onClick={() => setIsEditing(false)}>
                   Cancel
                 </Button>
               )}
@@ -130,18 +117,10 @@ export default function PhoneListPage() {
             </Paper>
 
             <Box display="flex" gap={2} justifyContent="center">
-              <Button 
-                variant="contained" 
-                color="primary" 
-                onClick={handleEdit}
-              >
+              <Button variant="contained" color="primary" onClick={handleEdit}>
                 Edit
               </Button>
-              <Button 
-                variant="outlined" 
-                color="error" 
-                onClick={handleDelete}
-              >
+              <Button variant="outlined" color="error" onClick={handleDelete}>
                 Delete
               </Button>
             </Box>
