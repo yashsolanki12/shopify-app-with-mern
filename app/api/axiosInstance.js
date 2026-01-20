@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const getBaseURL = () => {
-  const backendDomain = "https://ecswhatsup-backend.ecodesoft.net";
+  const backendDomain = "https://whatsapp-mern-backend-sidn.onrender.com";
 
   return `${backendDomain}/api`;
 };
