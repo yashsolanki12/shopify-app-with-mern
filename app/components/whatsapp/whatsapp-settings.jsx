@@ -82,7 +82,7 @@ export default function WhatsAppSettings({
   return (
     <Box
       sx={{
-        width: "calc(100vw - 52px)",
+        width: "calc(100vw - 56px)",
         ml: "calc(-50vw + 50% + 16px)",
         px: 2,
         mt: "24px",
