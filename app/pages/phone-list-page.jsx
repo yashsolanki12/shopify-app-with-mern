@@ -260,11 +260,12 @@ export default function PhoneListPage({
             }}
           >
             <Typography variant="body2" color="error.dark" fontWeight={600}>
-              ⚠️ WhatsApp Widget is disabled
+              ⚠️ WhatsApp Widget is Currently Inactive
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              To show the WhatsApp button on your store, you must enable the App
-              Embed in your theme editor.
+              To display WhatsApp widget on your storefront, please complete
+              the configuration below and enable the App Embed in your theme
+              editor.
             </Typography>
             <Button
               variant="contained"
@@ -294,7 +295,7 @@ export default function PhoneListPage({
             <Paper sx={{ p: 3, bgcolor: "grey.50" }}>
               <FormLabel
                 component="legend"
-                sx={{ fontSize: "1rem", fontWeight: 600, mb: '0.25rem' }}
+                sx={{ fontSize: "1rem", fontWeight: 600, mb: "0.25rem" }}
               >
                 Saved Phone Number:
               </FormLabel>
