@@ -29,6 +29,9 @@ import { useQueryClient } from "@tanstack/react-query";
 export default function PhoneListPage({
   appEmbedEnabled = false,
   initialSettings = {},
+  apiKey = "",
+  session = null,
+  foundBlockType = "",
 }) {
   const initialForm = { phone_number: "", country_code: "" };
 
@@ -268,8 +271,10 @@ export default function PhoneListPage({
               size="small"
               fullWidth
               onClick={() => {
-                const shop = sessionData?.session?.shop || window.location.host;
-                const url = `https://${shop}/admin/themes/current/editor?context=apps&activateAppId=a492873797ea660dcb0de6d95d8d5bac/whatsapp-script`;
+                const currentShop = session?.shop || sessionData?.session?.shop || new URLSearchParams(window.location.search).get("shop") || window.location.hostname;
+                // Redirect to the general apps context in the theme editor
+                // This will open the 'App embeds' tab directly
+                const url = `https://${currentShop}/admin/themes/current/editor?context=apps`;
                 window.open(url, "_blank");
               }}
               sx={{ textTransform: "none" }}

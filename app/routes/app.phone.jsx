@@ -89,17 +89,19 @@ export const loader = async ({ request }) => {
           initialSettings: {
             message: settings.default_message || "",
             position: settings.icon_position || "right"
-          }
+          },
+          apiKey: process.env.SHOPIFY_API_KEY,
+          foundBlockType: firstBlock.type
         };
       } else {
-        return { appEmbedEnabled: false, debugMessage: "No whatsapp-mern blocks found in settings" };
+        return { appEmbedEnabled: false, debugMessage: "No whatsapp-mern blocks found in settings", apiKey: process.env.SHOPIFY_API_KEY };
       }
     }
-    return { appEmbedEnabled: false, debugMessage: "settingsData.current.blocks is missing" };
+    return { appEmbedEnabled: false, debugMessage: "settingsData.current.blocks is missing", apiKey: process.env.SHOPIFY_API_KEY };
 
   } catch (error) {
     console.error("Error fetching theme settings:", error);
-    return { appEmbedEnabled: false, debugMessage: `Exception caught: ${error.message}` };
+    return { appEmbedEnabled: false, debugMessage: `Exception caught: ${error.message}`, apiKey: process.env.SHOPIFY_API_KEY };
   }
 };
 
@@ -112,6 +114,9 @@ export default function PhonePage() {
       <PhoneListPage
         appEmbedEnabled={appEmbedEnabled}
         initialSettings={data?.initialSettings}
+        apiKey={data?.apiKey}
+        session={data?.session}
+        foundBlockType={data?.foundBlockType}
       />
     </Suspense>
   );
