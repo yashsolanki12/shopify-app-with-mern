@@ -79,6 +79,7 @@ export default function WhatsAppSettings({
     }
   };
 
+
   return (
     <Box
       sx={{
@@ -116,7 +117,7 @@ export default function WhatsAppSettings({
               <FormControl component="fieldset">
                 <FormLabel
                   component="legend"
-                  sx={{ fontSize: "1.1rem", fontWeight: 600 }}
+                  sx={{ fontSize: "1rem", fontWeight: 600 }}
                 >
                   Chat Icon Position
                 </FormLabel>
@@ -142,7 +143,7 @@ export default function WhatsAppSettings({
               <FormControl component="fieldset">
                 <FormLabel
                   component="legend"
-                  sx={{ fontSize: "1.1rem", fontWeight: 600 }}
+                  sx={{ fontSize: "1rem", fontWeight: 600 }}
                 >
                   Custom Chat Icon
                 </FormLabel>
@@ -205,7 +206,7 @@ export default function WhatsAppSettings({
               <FormControl component="fieldset">
                 <FormLabel
                   component="legend"
-                  sx={{ fontSize: "1.1rem", fontWeight: 600 }}
+                  sx={{ fontSize: "1rem", fontWeight: 600 }}
                 >
                   Chat Icon Style
                 </FormLabel>
