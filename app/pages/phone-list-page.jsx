@@ -23,6 +23,7 @@ import Alert from "@mui/material/Alert";
 import CircularProgress from "@mui/material/CircularProgress";
 import React from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { FormLabel } from "@mui/material";
 
 // const PhoneModal = lazy(() => import("../components/phone/phone-modal"));
 
@@ -235,7 +236,7 @@ export default function PhoneListPage({
     <Container maxWidth="sm" sx={{ py: 4 }}>
       <Paper elevation={4} sx={{ p: 4, borderRadius: 3 }}>
         <Typography
-          variant="h4"
+          variant="h5"
           color="primary"
           fontWeight={700}
           mb={3}
@@ -271,7 +272,11 @@ export default function PhoneListPage({
               size="small"
               fullWidth
               onClick={() => {
-                const currentShop = session?.shop || sessionData?.session?.shop || new URLSearchParams(window.location.search).get("shop") || window.location.hostname;
+                const currentShop =
+                  session?.shop ||
+                  sessionData?.session?.shop ||
+                  new URLSearchParams(window.location.search).get("shop") ||
+                  window.location.hostname;
                 // Redirect to the general apps context in the theme editor
                 // This will open the 'App embeds' tab directly
                 const url = `https://${currentShop}/admin/themes/current/editor?context=apps`;
@@ -287,9 +292,12 @@ export default function PhoneListPage({
         {hasPhone && !editMode ? (
           <Stack spacing={3}>
             <Paper sx={{ p: 3, bgcolor: "grey.50" }}>
-              <Typography variant="h6" gutterBottom>
+              <FormLabel
+                component="legend"
+                sx={{ fontSize: "1rem", fontWeight: 600, mb: '0.25rem' }}
+              >
                 Saved Phone Number:
-              </Typography>
+              </FormLabel>
               <Typography variant="body1" sx={{ fontSize: "1.2rem" }}>
                 {data.data[0].country_code} {data.data[0].phone_number}
               </Typography>
@@ -376,7 +384,7 @@ export default function PhoneListPage({
       </Paper>
 
       {/* WhatsApp Settings */}
-      {hasPhone && appEmbedEnabled && (
+      {hasPhone && !editMode && appEmbedEnabled && (
         <WhatsAppSettings
           phoneData={data.data}
           initialSettings={{

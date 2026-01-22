@@ -4,26 +4,26 @@
 {% endcomment %}
 
 {% if block.settings.enabled %}
-  <div class="whatsapp-button-wrapper" id="whatsapp-button-wrapper">
+  <div class="whatsapp-button-wrapper" id="whatsapp-button-wrapper" style="display: none;">
     <!-- WhatsApp Icon and Text -->
     <div class="whatsapp-toggle-container" id="whatsapp-container">
       <a id="whatsapp-main-link" href="#" target="_blank" rel="noopener noreferrer" class="whatsapp-toggle-icon" title="Chat with us on WhatsApp">
         {% case block.settings.custom_icon %}
           {% when 'chat1' %}
-            <img src="{{ 'chat-icon-1.svg' | asset_url }}" alt="Chat" height="60px" width="60px">
+            <img id="whatsapp-icon-img-main" src="{{ 'chat-icon-1.svg' | asset_url }}" alt="Chat" height="60px" width="60px">
           {% when 'chat2' %}
-            <img src="{{ 'chat-icon-2.svg' | asset_url }}" alt="Chat" height="60px" width="60px">
+            <img id="whatsapp-icon-img-main" src="{{ 'chat-icon-2.svg' | asset_url }}" alt="Chat" height="60px" width="60px">
           {% when 'chat3' %}
-            <img src="{{ 'chat-icon-3.svg' | asset_url }}" alt="Chat" height="60px" width="60px">
+            <img id="whatsapp-icon-img-main" src="{{ 'chat-icon-3.svg' | asset_url }}" alt="Chat" height="60px" width="60px">
           {% else %}
-            <img src="{{ 'whatsapp.png' | asset_url }}" alt="WhatsApp" height="60px" width="60px">
+            <img id="whatsapp-icon-img-main" src="{{ 'whatsapp.png' | asset_url }}" alt="WhatsApp" height="60px" width="60px">
         {% endcase %}
       </a>
-        <a id="whatsapp-link"
-        href="https://wa.me/{{ block.settings.phone_number | default: '' }}"
+        <a id="whatsapp-text-link"
+        href="#"
         target="_blank"
         rel="noopener noreferrer">
-      <span class="whatsapp-toggle-text" id="whatsapp-text" style="display: {% if block.settings.button_style == 'icon_with_text' %}inline-block{% else %}none{% endif %};">WhatsApp us</span>
+      <span class="whatsapp-toggle-text" id="whatsapp-text" style="display: none;">WhatsApp us</span>
       </a>
     </div>
     
@@ -36,21 +36,21 @@
         <label style="margin-right:10px;"><input type="radio" name="whatsapp-position" value="left"> Left</label>
         <label><input type="radio" name="whatsapp-position" value="right" checked> Right</label>
       </div>
-      <a id="whatsapp-link"
-        href="https://wa.me/{{ block.settings.phone_number | default: '' }}"
+      <a id="whatsapp-link-widget"
+        href="#"
         target="_blank"
         rel="noopener noreferrer"
         class="whatsapp-embed-logo"
         title="Chat with us on WhatsApp">
         {% case block.settings.custom_icon %}
           {% when 'chat1' %}
-            <img src="{{ 'chat-icon-1.svg' | asset_url }}" alt="Chat" height="60px" width="60px" loading="lazy">
+            <img id="whatsapp-icon-img-widget" src="{{ 'chat-icon-1.svg' | asset_url }}" alt="Chat" height="60px" width="60px" loading="lazy">
           {% when 'chat2' %}
-            <img src="{{ 'chat-icon-2.svg' | asset_url }}" alt="Chat" height="60px" width="60px" loading="lazy">
+            <img id="whatsapp-icon-img-widget" src="{{ 'chat-icon-2.svg' | asset_url }}" alt="Chat" height="60px" width="60px" loading="lazy">
           {% when 'chat3' %}
-            <img src="{{ 'chat-icon-3.svg' | asset_url }}" alt="Chat" height="60px" width="60px" loading="lazy">
+            <img id="whatsapp-icon-img-widget" src="{{ 'chat-icon-3.svg' | asset_url }}" alt="Chat" height="60px" width="60px" loading="lazy">
           {% else %}
-            <img src="{{ 'whatsapp.png' | asset_url }}" alt="WhatsApp" height="60px" width="60px" loading="lazy">
+            <img id="whatsapp-icon-img-widget" src="{{ 'whatsapp.png' | asset_url }}" alt="WhatsApp" height="60px" width="60px" loading="lazy">
         {% endcase %}
       </a>
       <div style="margin-top:10px;">
@@ -63,16 +63,20 @@
   {{ 'whatsapp-logo.css' | asset_url | stylesheet_tag }}
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-    
+      // Asset URLs for dynamic icon switching
+      const assets = {
+        'whatsapp': "{{ 'whatsapp.png' | asset_url }}",
+        'chat1': "{{ 'chat-icon-1.svg' | asset_url }}",
+        'chat2': "{{ 'chat-icon-2.svg' | asset_url }}",
+        'chat3': "{{ 'chat-icon-3.svg' | asset_url }}"
+      };
 
       // Get shop domain from URL
       function getShopDomain() {
         if(typeof window !== 'undefined') {
-          const match = window.location.host
-           return match 
-            // Return null if no match is found
-          }
-          return null;
+          return window.location.host;
+        }
+        return null;
       }
       
       // REAL API CALL: Fetch phone number with dynamic shop domain header and update WhatsApp link
@@ -92,72 +96,77 @@
             credentials: 'include'
           });
           const result = await response.json();
-          const whatsappLink = document.getElementById('whatsapp-link');
-          const whatsappMainLink = document.getElementById('whatsapp-main-link');
-          const messageInput = document.getElementById('whatsapp-message');
+          const wrapper = document.getElementById('whatsapp-button-wrapper');
+          
           if (result && Array.isArray(result.data) && result.data.length > 0) {
             const phoneData = result.data[0];
+            const whatsappLinkWidget = document.getElementById('whatsapp-link-widget');
+            const whatsappMainLink = document.getElementById('whatsapp-main-link');
+            const whatsappTextLink = document.getElementById('whatsapp-text-link');
+            const messageInput = document.getElementById('whatsapp-message');
+            const textElement = document.getElementById('whatsapp-text');
+            const iconMain = document.getElementById('whatsapp-icon-img-main');
+            const iconWidget = document.getElementById('whatsapp-icon-img-widget');
             
-            const apiMessage = phoneData.message;
-            const apiPosition = phoneData.position;
+            // Show wrapper as we have data
+            if (wrapper) wrapper.style.display = 'block';
+
+            const apiMessage = phoneData.message || "";
+            const apiPosition = phoneData.position || "right";
+            const apiButtonStyle = phoneData.button_style || "icon_only";
+            const apiCustomIcon = phoneData.custom_icon || "whatsapp";
             
-            if (messageInput && apiMessage !== undefined) {
+            if (messageInput) {
               messageInput.value = apiMessage;
-            } else {
-              messageInput.value = "{{ block.settings.default_message | escape }}";
             }
             
-            function updateWhatsAppLinkWithMessage(baseLink) {
-              let msg = messageInput ? messageInput.value.trim() : '';
-              if (msg.length > 0) {
-                return `${baseLink}?text=${encodeURIComponent(msg)}`;
-              }
-              return baseLink;
+            if (textElement) {
+              textElement.style.display = apiButtonStyle === 'icon_with_text' ? 'inline-block' : 'none';
             }
 
-            const links = result.data.map((item) => {
-              if (item.country_code && item.phone_number) {
-                const fullNumber = (item.country_code + item.phone_number).replace(/(\+)(?=\d)/g, "").replace(/\D/g, "");
-                return `https://wa.me/${fullNumber}`;
-              }
-              return null;
-            }).filter(Boolean);
+            // Update Icons
+            const iconSrc = assets[apiCustomIcon] || assets['whatsapp'];
+            if (iconMain && iconSrc) iconMain.src = iconSrc;
+            if (iconWidget && iconSrc) iconWidget.src = iconSrc;
 
-            if (links.length > 0) {
-              const finalLink = updateWhatsAppLinkWithMessage(links[0]);
-              if (whatsappLink) whatsappLink.href = finalLink;
-              if (whatsappMainLink) whatsappMainLink.href = finalLink;
+            function updateWhatsAppLinks() {
+              const fullNumber = (phoneData.country_code + phoneData.phone_number).replace(/(\+)(?=\d)/g, "").replace(/\D/g, "");
+              let baseLink = `https://wa.me/${fullNumber}`;
+              let msg = messageInput ? messageInput.value.trim() : apiMessage;
+              const finalLink = msg ? `${baseLink}?text=${encodeURIComponent(msg)}` : baseLink;
               
-              const finalPosition = apiPosition || '{{ block.settings.icon_position | escape }}' || 'right';
-              const container = document.getElementById('whatsapp-container');
-              if (container) {
-                container.style.right = '';
-                container.style.left = '';
-                container.style[finalPosition] = '30px';
-              }
+              if (whatsappLinkWidget) whatsappLinkWidget.href = finalLink;
+              if (whatsappMainLink) whatsappMainLink.href = finalLink;
+              if (whatsappTextLink) whatsappTextLink.href = finalLink;
+            }
 
-              if (messageInput) {
-                messageInput.addEventListener('input', function() {
-                  const updatedLink = updateWhatsAppLinkWithMessage(links[0]);
-                  if (whatsappLink) whatsappLink.href = updatedLink;
-                  if (whatsappMainLink) whatsappMainLink.href = updatedLink;
-                });
-              }
-              if (window.Shopify && window.Shopify.designMode) {
-                [whatsappLink, whatsappMainLink].forEach(link => {
-                  if (link) {
-                    link.addEventListener('click', function(e) {
-                      e.preventDefault();
-                      alert('WhatsApp link preview is disabled in the theme editor. This will work on your live store.');
-                    });
-                  }
-                });
-              }
-            } else {
-              console.error('No valid phone data found in API response.');
+            updateWhatsAppLinks();
+            
+            // Update Position
+            const container = document.getElementById('whatsapp-container');
+            if (container) {
+              container.style.right = '';
+              container.style.left = '';
+              container.style[apiPosition] = '30px';
+            }
+
+            if (messageInput) {
+              messageInput.addEventListener('input', updateWhatsAppLinks);
+            }
+
+            if (window.Shopify && window.Shopify.designMode) {
+              [whatsappLinkWidget, whatsappMainLink, whatsappTextLink].forEach(link => {
+                if (link) {
+                  link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    alert('WhatsApp link preview is disabled in the theme editor. This will work on your live store.');
+                  });
+                }
+              });
             }
           } else {
-            console.error('API did not return valid phone data');
+            // Hide wrapper if no data
+            if (wrapper) wrapper.style.display = 'none';
           }
         } catch (error) {
           console.error('Error calling phone API:', error);
@@ -169,7 +178,6 @@
         const widget = document.getElementById('whatsapp-widget');
         const textElement = document.getElementById('whatsapp-text');
         const showTextToggle = document.getElementById('show-text-toggle');
-        const mainLink = document.getElementById('whatsapp-main-link');
         let isWidgetVisible = false;
         
         if (container && widget) {
@@ -181,7 +189,6 @@
         }
         
         if (showTextToggle && textElement) {
-          showTextToggle.checked = {{ block.settings.button_style | json }} === 'icon_with_text';
           showTextToggle.addEventListener('change', function() {
             textElement.style.display = this.checked ? 'inline-block' : 'none';
           });
@@ -203,22 +210,16 @@
           }
         }
         
-        let initial = '{{ block.settings.icon_position | escape }}' || 'right';
-        updateIconPosition(initial);
-        
         radios.forEach(function(radio) {
-          radio.checked = radio.value === initial;
           radio.addEventListener('change', function() {
             if (this.checked) updateIconPosition(this.value);
           });
         });
       }
       
-      if ({{ block.settings.enabled | json }}) {
-        fetchPhoneNumberAndUpdateLink();
-        setIconPosition();
-        initToggle();
-      }
+      fetchPhoneNumberAndUpdateLink();
+      setIconPosition();
+      initToggle();
       
       if (window.Shopify && window.Shopify.designMode) {
         const toggleInput = document.querySelector('input[name*="[enabled]"]');
