@@ -241,6 +241,44 @@ export default function PhoneListPage({
           Phone Number
         </Typography>
 
+        {!appEmbedEnabled && (
+          <Box
+            sx={{
+              p: 2,
+              mb: 3,
+              borderRadius: 2,
+              bgcolor: "error.lighter",
+              border: "1px solid",
+              borderColor: "error.light",
+              display: "flex",
+              flexDirection: "column",
+              gap: 1.5,
+            }}
+          >
+            <Typography variant="body2" color="error.dark" fontWeight={600}>
+              ⚠️ WhatsApp Widget is disabled
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              To show the WhatsApp button on your store, you must enable the App
+              Embed in your theme editor.
+            </Typography>
+            <Button
+              variant="contained"
+              color="error"
+              size="small"
+              fullWidth
+              onClick={() => {
+                const shop = sessionData?.session?.shop || window.location.host;
+                const url = `https://${shop}/admin/themes/current/editor?context=apps&activateAppId=a492873797ea660dcb0de6d95d8d5bac/whatsapp-script`;
+                window.open(url, "_blank");
+              }}
+              sx={{ textTransform: "none" }}
+            >
+              Enable in Theme Editor
+            </Button>
+          </Box>
+        )}
+
         {hasPhone && !editMode ? (
           <Stack spacing={3}>
             <Paper sx={{ p: 3, bgcolor: "grey.50" }}>
@@ -257,7 +295,7 @@ export default function PhoneListPage({
                 variant="contained"
                 color="primary"
                 onClick={handleEdit}
-                disabled={saveLoading } //|| deleteLoading
+                disabled={saveLoading} //|| deleteLoading
                 sx={{ textTransform: "none" }}
               >
                 Edit
@@ -306,7 +344,7 @@ export default function PhoneListPage({
                 disabled={
                   !form.phone_number.trim() ||
                   !form.country_code.trim() ||
-                  saveLoading 
+                  saveLoading
                   // || deleteLoading
                 }
                 startIcon={saveLoading ? <CircularProgress size={20} /> : null}
@@ -321,7 +359,7 @@ export default function PhoneListPage({
                     setEditMode(false);
                     setForm(initialForm);
                   }}
-                  disabled={saveLoading } // || deleteLoading
+                  disabled={saveLoading} // || deleteLoading
                   sx={{ textTransform: "none" }}
                 >
                   Cancel
