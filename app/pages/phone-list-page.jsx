@@ -25,6 +25,7 @@ import React from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { FormLabel } from "@mui/material";
 
+import { phoneSchema } from "../validation/phone.schema";
 // const PhoneModal = lazy(() => import("../components/phone/phone-modal"));
 
 export default function PhoneListPage({
@@ -40,6 +41,7 @@ export default function PhoneListPage({
   // ...
   const [editMode, setEditMode] = React.useState(false);
   const [form, setForm] = React.useState(initialForm);
+  const [formErrors, setFormErrors] = React.useState(initialForm);
   const [snackbar, setSnackbar] = React.useState({
     open: false,
     message: "",
@@ -109,6 +111,19 @@ export default function PhoneListPage({
   });
 
   const handleSave = async () => {
+    // Zod validation
+    const result = phoneSchema.safeParse(form);
+    if (!result.success) {
+      const errors = {};
+      result.error.issues.forEach((issue) => {
+        if (issue.path[0]) {
+          errors[issue.path[0]] = issue.message;
+        }
+      });
+      setFormErrors(errors);
+      return;
+    }
+
     setSaveLoading(true);
     try {
       let response;
@@ -133,6 +148,7 @@ export default function PhoneListPage({
         queryClient.invalidateQueries({ queryKey: ["phone"] });
         setEditMode(false);
         setForm(initialForm);
+        setFormErrors(initialForm);
       }
     } catch (error) {
       const errorMessages = error.response?.data;
@@ -166,6 +182,7 @@ export default function PhoneListPage({
         setSelectedId(ele._id);
       });
       setEditMode(true);
+      setFormErrors(initialForm);
     }
   };
 
@@ -333,21 +350,31 @@ export default function PhoneListPage({
               fullWidth
               label="Country Code"
               value={form.country_code}
-              onChange={(e) =>
-                setForm((prev) => ({ ...prev, country_code: e.target.value }))
-              }
-              placeholder="e.g. +1, +91, +44"
+              onChange={(e) => {
+                setForm((prev) => ({ ...prev, country_code: e.target.value }));
+                if (formErrors.country_code) {
+                  setFormErrors((prev) => ({ ...prev, country_code: "" }));
+                }
+              }}
+              placeholder="e.g. +1, +41"
+              error={!!formErrors.country_code}
+              helperText={formErrors.country_code}
             />
 
             <TextField
               fullWidth
               label="Phone Number"
               value={form.phone_number}
-              onChange={(e) =>
-                setForm((prev) => ({ ...prev, phone_number: e.target.value }))
-              }
+              onChange={(e) => {
+                setForm((prev) => ({ ...prev, phone_number: e.target.value }));
+                if (formErrors.phone_number) {
+                  setFormErrors((prev) => ({ ...prev, phone_number: "" }));
+                }
+              }}
               placeholder="Enter phone number"
-              type="tel"
+              type="text"
+              error={!!formErrors.phone_number}
+              helperText={formErrors.phone_number}
             />
 
             <Box display="flex" gap={2} justifyContent="center">
@@ -372,6 +399,7 @@ export default function PhoneListPage({
                   onClick={() => {
                     setEditMode(false);
                     setForm(initialForm);
+                    setFormErrors(initialForm);
                   }}
                   disabled={saveLoading} // || deleteLoading
                   sx={{ textTransform: "none" }}
