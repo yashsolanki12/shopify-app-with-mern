@@ -1,7 +1,7 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
 client_id = "a492873797ea660dcb0de6d95d8d5bac"
-name = "whatsapp-mern-app"
+name = "ECS WhatsApp Chat"
 application_url = "http://ecswhatsup.ecodesoft.net"
 embedded = true
 
