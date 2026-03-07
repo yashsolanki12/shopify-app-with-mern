@@ -7,6 +7,8 @@ import {
   DialogActions,
   TextField,
   Button,
+  Typography,
+  InputAdornment,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { phoneSchema } from "../../validation/phone.schema";
@@ -134,7 +136,21 @@ export default function PhoneModal(props) {
             }
           }}
           error={!!formErrors.phone_number}
-          helperText={formErrors.phone_number}
+          helperText={
+            formErrors.phone_number
+              ? formErrors.phone_number
+              : 'No leading "+", for example: 1234567890'
+          }
+          inputProps={{ maxLength: 15 }}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <Typography variant="caption" color="textSecondary">
+                  {form.phone_number?.length || 0}/15
+                </Typography>
+              </InputAdornment>
+            ),
+          }}
           fullWidth
           margin="normal"
           required

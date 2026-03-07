@@ -21,6 +21,7 @@ import Stack from "@mui/material/Stack";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import CircularProgress from "@mui/material/CircularProgress";
+import InputAdornment from "@mui/material/InputAdornment";
 import React from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { FormLabel } from "@mui/material";
@@ -280,9 +281,8 @@ export default function PhoneListPage({
               ⚠️ WhatsApp Widget is Currently Inactive
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              To display WhatsApp widget on your storefront, please complete
-              the configuration below and enable the App Embed in your theme
-              editor.
+              To display WhatsApp widget on your storefront, please complete the
+              configuration below and enable the App Embed in your theme editor.
             </Typography>
             <Button
               variant="contained"
@@ -335,7 +335,7 @@ export default function PhoneListPage({
                 variant="outlined"
                 color="error"
                 onClick={handleDelete}
-                disabled={saveLoading || deleteLoading}
+                disabled={saveLoading} // || deleteLoading}
                 startIcon={
                   deleteLoading ? <CircularProgress size={20} /> : null
                 }
@@ -358,7 +358,23 @@ export default function PhoneListPage({
               }}
               placeholder="e.g. +1, +41"
               error={!!formErrors.country_code}
-              helperText={formErrors.country_code}
+              helperText={
+                formErrors.country_code
+                  ? formErrors.country_code
+                  : "Country code must start with '+', " +
+                    "1 to 4 digits (e.g., +91)."
+              }
+              inputProps={{ maxLength: 5 }}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <Typography variant="caption" color="textSecondary">
+                      {form.country_code?.length || 0}/5
+                    </Typography>
+                  </InputAdornment>
+                ),
+              }}
+              //
             />
 
             <TextField
@@ -371,10 +387,24 @@ export default function PhoneListPage({
                   setFormErrors((prev) => ({ ...prev, phone_number: "" }));
                 }
               }}
-              placeholder="Enter phone number"
+              placeholder="e.g. 8265683421"
               type="text"
               error={!!formErrors.phone_number}
-              helperText={formErrors.phone_number}
+              helperText={
+                formErrors.phone_number
+                  ? formErrors.phone_number
+                  : 'No leading "+", for example: 1234567890.'
+              }
+              inputProps={{ maxLength: 15 }}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <Typography variant="caption" color="textSecondary">
+                      {form.phone_number?.length || 0}/15
+                    </Typography>
+                  </InputAdornment>
+                ),
+              }}
             />
 
             <Box display="flex" gap={2} justifyContent="center">
