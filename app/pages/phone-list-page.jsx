@@ -1,6 +1,6 @@
 import Loader from "../components/skeleton/loader";
-import WhatsAppSettings from "../components/whatsapp/whatsapp-settings";
-import WhatsAppIcon from "../components/whatsapp/whatsapp-icon";
+// import WhatsAppSettings from "../components/whatsapp/whatsapp-settings";
+// import WhatsAppIcon from "../components/whatsapp/whatsapp-icon";
 
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -39,7 +39,6 @@ export default function PhoneListPage({
   const initialForm = { phone_number: "", country_code: "" };
 
   const queryClient = useQueryClient();
-  // ...
   const [editMode, setEditMode] = React.useState(false);
   const [form, setForm] = React.useState(initialForm);
   const [formErrors, setFormErrors] = React.useState(initialForm);
@@ -51,22 +50,23 @@ export default function PhoneListPage({
   const [selectedId, setSelectedId] = React.useState("");
   const [saveLoading, setSaveLoading] = React.useState(false);
   // const [deleteLoading, setDeleteLoading] = React.useState(false);
-  const [iconPosition, setIconPosition] = React.useState(
-    initialSettings?.position || "right",
-  );
-  const [message, setMessage] = React.useState(initialSettings?.message || "");
-  const [buttonStyle, setButtonStyle] = React.useState(
-    initialSettings?.button_style || "icon_only",
-  );
-  const [customIcon, setCustomIcon] = React.useState(
-    initialSettings?.custom_icon || "whatsapp",
-  );
+  // const [iconPosition, setIconPosition] = React.useState(
+  //   initialSettings?.position || "right",
+  // );
+  // const [message, setMessage] = React.useState(initialSettings?.message || "");
+  // const [buttonStyle, setButtonStyle] = React.useState(
+  //   initialSettings?.button_style || "icon_only",
+  // );
+  // const [customIcon, setCustomIcon] = React.useState(
+  //   initialSettings?.custom_icon || "whatsapp",
+  // );
   // Phone list
   const { error, data, isLoading } = useQuery({
     queryKey: ["phone"],
     queryFn: () => getAllPhone(),
     retry: 3,
     retryDelay: 1000,
+    refetchOnWindowFocus: true, // Enable refetch on window focus
     onError: (error) => {
       console.error("Phone list query error:", error);
       setSnackbar({
@@ -77,24 +77,40 @@ export default function PhoneListPage({
     },
   });
 
+  // Refresh data when user comes back to the tab (e.g., after enabling in theme editor)
   React.useEffect(() => {
-    if (initialSettings && !data?.data?.[0]) {
-      setIconPosition(initialSettings.position || "right");
-      setMessage(initialSettings.message || "");
-      setButtonStyle(initialSettings.button_style || "icon_only");
-      setCustomIcon(initialSettings.custom_icon || "whatsapp");
-    }
-  }, [initialSettings, data]);
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        // Tab became visible, refresh the phone data
+        queryClient.invalidateQueries({ queryKey: ["phone"] });
+      }
+    };
 
-  React.useEffect(() => {
-    if (data?.data?.[0]) {
-      const phoneData = data.data[0];
-      if (phoneData.position) setIconPosition(phoneData.position);
-      if (phoneData.message !== undefined) setMessage(phoneData.message);
-      if (phoneData.button_style) setButtonStyle(phoneData.button_style);
-      if (phoneData.custom_icon) setCustomIcon(phoneData.custom_icon);
-    }
-  }, [data]);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [queryClient]);
+
+  // React.useEffect(() => {
+  //   if (initialSettings && !data?.data?.[0]) {
+  //     setIconPosition(initialSettings.position || "right");
+  //     setMessage(initialSettings.message || "");
+  //     setButtonStyle(initialSettings.button_style || "icon_only");
+  //     setCustomIcon(initialSettings.custom_icon || "whatsapp");
+  //   }
+  // }, [initialSettings, data]);
+
+  // React.useEffect(() => {
+  //   if (data?.data?.[0]) {
+  //     const phoneData = data.data[0];
+  //     if (phoneData.position) setIconPosition(phoneData.position);
+  //     if (phoneData.message !== undefined) setMessage(phoneData.message);
+  //     if (phoneData.button_style) setButtonStyle(phoneData.button_style);
+  //     if (phoneData.custom_icon) setCustomIcon(phoneData.custom_icon);
+  //   }
+  // }, [data]);
 
   // Current Session
   const {
@@ -187,25 +203,25 @@ export default function PhoneListPage({
     }
   };
 
-  const handleSettingsUpdate = (newSettings) => {
-    setMessage(newSettings.message);
-    setIconPosition(newSettings.position);
-    setButtonStyle(newSettings.button_style);
-    setCustomIcon(newSettings.custom_icon);
-    setSnackbar({
-      open: true,
-      message: "WhatsApp settings updated successfully.",
-      severity: "success",
-    });
-  };
+  // const handleSettingsUpdate = (newSettings) => {
+  //   setMessage(newSettings.message);
+  //   setIconPosition(newSettings.position);
+  //   setButtonStyle(newSettings.button_style);
+  //   setCustomIcon(newSettings.custom_icon);
+  //   setSnackbar({
+  //     open: true,
+  //     message: "WhatsApp settings updated successfully.",
+  //     severity: "success",
+  //   });
+  // };
 
-  const handleSettingsError = (errorMessage) => {
-    setSnackbar({
-      open: true,
-      message: errorMessage,
-      severity: "error",
-    });
-  };
+  // const handleSettingsError = (errorMessage) => {
+  //   setSnackbar({
+  //     open: true,
+  //     message: errorMessage,
+  //     severity: "error",
+  //   });
+  // };
 
   // const handleDelete = async () => {
   //   setDeleteLoading(true);
@@ -296,8 +312,9 @@ export default function PhoneListPage({
                   new URLSearchParams(window.location.search).get("shop") ||
                   window.location.hostname;
                 // Redirect to the general apps context in the theme editor
-                // This will open the 'App embeds' tab directly
-                const url = `https://${currentShop}/admin/themes/current/editor?context=apps`;
+                // Add timestamp to force fresh load (bypass cache)
+                const timestamp = Date.now();
+                const url = `https://${currentShop}/admin/themes/current/editor?context=apps&_=${timestamp}`;
                 window.open(url, "_blank");
               }}
               sx={{ textTransform: "none" }}
@@ -443,7 +460,7 @@ export default function PhoneListPage({
       </Paper>
 
       {/* WhatsApp Settings */}
-      {hasPhone && !editMode && appEmbedEnabled && (
+      {/* {hasPhone && !editMode && appEmbedEnabled && (
         <WhatsAppSettings
           phoneData={data.data}
           initialSettings={{
@@ -455,17 +472,17 @@ export default function PhoneListPage({
           onSettingsUpdate={handleSettingsUpdate}
           onError={handleSettingsError}
         />
-      )}
+      )} */}
 
       {/* WhatsApp Floating Icon */}
-      <WhatsAppIcon
+      {/* <WhatsAppIcon
         phoneData={hasPhone ? data.data : null}
         message={message}
         iconPosition={iconPosition}
         buttonStyle={buttonStyle}
         customIcon={customIcon}
         appEmbedEnabled={appEmbedEnabled}
-      />
+      /> */}
 
       <Snackbar
         open={snackbar.open}
