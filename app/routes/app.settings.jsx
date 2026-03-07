@@ -2,10 +2,11 @@ import { Suspense, lazy } from "react";
 import { useLoaderData } from "react-router";
 import { authenticate } from "../shopify.server";
 
-const PhoneListPage = lazy(() => import("../pages/phone-list-page"));
+const WhatsAppSettingsDesign = lazy(
+  () => import("../components/whatsapp/whatsapp-settings-design"),
+);
 
 export const loader = async ({ request }) => {
-  // ... keep loader logic
   const { admin, session } = await authenticate.admin(request);
 
   try {
@@ -17,18 +18,24 @@ export const loader = async ({ request }) => {
           "X-Shopify-Access-Token": session.accessToken,
           "Content-Type": "application/json",
         },
-      }
+      },
     );
 
     if (!themesResponse.ok) {
       const errorText = await themesResponse.text();
-      return { appEmbedEnabled: false, debugMessage: `Theme fetch failed: ${themesResponse.status} ${errorText}` };
+      return {
+        appEmbedEnabled: false,
+        debugMessage: `Theme fetch failed: ${themesResponse.status} ${errorText}`,
+      };
     }
 
     const themesData = await themesResponse.json();
 
     if (!themesData.themes || themesData.themes.length === 0) {
-      return { appEmbedEnabled: false, debugMessage: "No main theme found in themes list" };
+      return {
+        appEmbedEnabled: false,
+        debugMessage: "No main theme found in themes list",
+      };
     }
 
     const mainTheme = themesData.themes[0];
@@ -41,19 +48,25 @@ export const loader = async ({ request }) => {
           "X-Shopify-Access-Token": session.accessToken,
           "Content-Type": "application/json",
         },
-      }
+      },
     );
 
     if (!assetsResponse.ok) {
       const errorText = await assetsResponse.text();
-      return { appEmbedEnabled: false, debugMessage: `Asset fetch failed: ${assetsResponse.status} ${errorText}` };
+      return {
+        appEmbedEnabled: false,
+        debugMessage: `Asset fetch failed: ${assetsResponse.status} ${errorText}`,
+      };
     }
 
     const assetData = await assetsResponse.json();
     const asset = assetData.asset;
 
     if (!asset || !asset.value) {
-      return { appEmbedEnabled: false, debugMessage: "settings_data.json asset or value is missing" };
+      return {
+        appEmbedEnabled: false,
+        debugMessage: "settings_data.json asset or value is missing",
+      };
     }
 
     const settingsJson = asset.value;
@@ -62,17 +75,17 @@ export const loader = async ({ request }) => {
     if (settingsData.current && settingsData.current.blocks) {
       // Filter for all blocks that match the whatsapp-mern type
       const whatsappBlocks = Object.keys(settingsData.current.blocks)
-        .filter(key => {
+        .filter((key) => {
           const block = settingsData.current.blocks[key];
           return block.type && block.type.includes("whatsapp-mern");
         })
-        .map(key => settingsData.current.blocks[key]);
+        .map((key) => settingsData.current.blocks[key]);
 
       // console.log(`Debug: Found ${whatsappBlocks.length} whatsapp-mern blocks`);
 
       if (whatsappBlocks.length > 0) {
         // Check if ANY of the blocks are enabled (both App Embed toggle AND inner settings)
-        const isAnyEnabled = whatsappBlocks.some(block => {
+        const isAnyEnabled = whatsappBlocks.some((block) => {
           const isAppEmbedOn = !block.disabled;
           // Inner setting 'enabled' defaults to true if missing
           const isInnerSettingOn = block.settings.enabled !== false;
@@ -87,35 +100,50 @@ export const loader = async ({ request }) => {
           debugMessage: `Found blocks. Decision: ${isAnyEnabled}`,
           initialSettings: {
             message: settings.default_message || "",
-            position: settings.icon_position || "right"
+            position: settings.icon_position || "right",
           },
           apiKey: process.env.SHOPIFY_API_KEY,
-          foundBlockType: firstBlock.type
+          foundBlockType: firstBlock.type,
         };
       } else {
-        return { appEmbedEnabled: false, debugMessage: "No whatsapp-mern blocks found in settings", apiKey: process.env.SHOPIFY_API_KEY };
+        return {
+          appEmbedEnabled: false,
+          debugMessage: "No whatsapp-mern blocks found in settings",
+          apiKey: process.env.SHOPIFY_API_KEY,
+        };
       }
     }
-    return { appEmbedEnabled: false, debugMessage: "settingsData.current.blocks is missing", apiKey: process.env.SHOPIFY_API_KEY };
-
+    return {
+      appEmbedEnabled: false,
+      debugMessage: "settingsData.current.blocks is missing",
+      apiKey: process.env.SHOPIFY_API_KEY,
+    };
   } catch (error) {
     console.error("Error fetching theme settings:", error);
-    return { appEmbedEnabled: false, debugMessage: `Exception caught: ${error.message}`, apiKey: process.env.SHOPIFY_API_KEY };
+    return {
+      appEmbedEnabled: false,
+      debugMessage: `Exception caught: ${error.message}`,
+      apiKey: process.env.SHOPIFY_API_KEY,
+    };
   }
 };
-
-export default function PhonePage() {
+export default function Settings() {
   const data = useLoaderData();
   const appEmbedEnabled = data?.appEmbedEnabled ?? false;
+  const session = data?.session;
 
   return (
-    <Suspense fallback={""}>
-      <PhoneListPage
+    <Suspense fallback={null}>
+      <WhatsAppSettingsDesign
+        initialSettings={data?.initialSettings || {}}
         appEmbedEnabled={appEmbedEnabled}
-        initialSettings={data?.initialSettings}
-        apiKey={data?.apiKey}
-        session={data?.session}
-        foundBlockType={data?.foundBlockType}
+        apiKey={data?.apiKey || ""}
+        foundBlockType={data?.foundBlockType || ""}
+        session={session}
+        onSettingsUpdate={() => {}}
+        onError={(error) => {
+          console.error("Settings error:", error);
+        }}
       />
     </Suspense>
   );

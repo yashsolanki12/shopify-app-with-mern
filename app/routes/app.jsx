@@ -34,9 +34,9 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AppProvider embedded apiKey={apiKey}>
-        {/* <s-app-nav>
-          <s-link href="/app/phone">Phone</s-link>
-        </s-app-nav> */}
+        <s-app-nav>
+          <s-link href="/app/settings">Settings</s-link>
+        </s-app-nav>
         <Outlet />
       </AppProvider>
     </QueryClientProvider>

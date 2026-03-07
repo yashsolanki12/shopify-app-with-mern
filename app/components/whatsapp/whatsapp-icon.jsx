@@ -9,7 +9,6 @@ export default function WhatsAppIcon({
   customIcon = "whatsapp",
   appEmbedEnabled = false,
 }) {
-  console.log("Phone", phoneData);
   if (!appEmbedEnabled || !phoneData?.length) return null;
 
   const fullNumber = phoneData.map((ele) => {

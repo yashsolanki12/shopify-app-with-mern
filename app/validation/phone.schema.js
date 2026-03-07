@@ -11,6 +11,6 @@ export const phoneSchema = z.object({
     .min(1, { message: "Country code is required." })
     .regex(/^\+\d{1,4}$/, {
       message:
-        "Country code must start with '+' followed by 1 to 4 digits (e.g., +91).",
+        "Country code must start with '+', 1 to 4 digits (e.g., +91).",
     }),
 });
