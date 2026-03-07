@@ -1,8 +1,8 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
 client_id = "a492873797ea660dcb0de6d95d8d5bac"
-name = "whatsapp-mern-app"
-application_url = "https://whatsapp-mern-web.onrender.com"
+name = "ECS WhatsApp Chat"
+application_url = "http://ecswhatsup.ecodesoft.net"
 embedded = true
 
 [build]
@@ -13,7 +13,7 @@ api_version = "2026-01"
 
   [[webhooks.subscriptions]]
   topics = [ "app/uninstalled" ]
-  uri = "https://whatsapp-mern-backend-sidn.onrender.com/api/shopify/webhook"
+  uri = "https://ecswhatsup-backend.ecodesoft.net/api/shopify/webhook"
 
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
@@ -21,7 +21,7 @@ scopes = "write_products,read_themes"
 
 [auth]
 redirect_urls = [
-  "https://whatsapp-mern-web.onrender.com/auth/callback",
-  "https://whatsapp-mern-web.onrender.com/auth/shopify/callback",
-  "https://whatsapp-mern-web.onrender.com/api/auth/callback"
+  "http://ecswhatsup.ecodesoft.net/auth/callback",
+  "http://ecswhatsup.ecodesoft.net/auth/shopify/callback",
+  "http://ecswhatsup.ecodesoft.net/api/auth/callback"
 ]

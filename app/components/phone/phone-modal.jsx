@@ -126,10 +126,9 @@ export default function PhoneModal(props) {
         <TextField
           label="Phone Number"
           value={form.phone_number}
-          type="number"
+          type="text"
           onChange={(e) => {
-            // Always store as string to avoid losing leading zeros
-            handleChange("phone_number", e.target.value.toString());
+            handleChange("phone_number", e.target.value);
             if (formErrors.phone_number) {
               setFormErrors((prev) => ({ ...prev, phone_number: "" }));
             }
@@ -143,6 +142,7 @@ export default function PhoneModal(props) {
         <TextField
           label="Country Code"
           value={form.country_code}
+          type="text"
           onChange={(e) => {
             handleChange("country_code", e.target.value);
             if (formErrors.country_code) {
