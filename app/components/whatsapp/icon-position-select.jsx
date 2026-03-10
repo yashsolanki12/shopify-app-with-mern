@@ -114,9 +114,11 @@ export default function IconPositionSelect({ value, onChange }) {
           onChange={(e) => onChange(e.target.value)}
           sx={{
             display: "flex",
-            flexWrap: "wrap",
-            gap: 2,
+            flexWrap: { xs: "nowrap", sm: "wrap" },
+            gap: { xs: 1, sm: 2 },
             justifyContent: "flex-start",
+            overflowX: { xs: "auto", sm: "visible" },
+            pb: { xs: 1, sm: 0 },
           }}
         >
           {positionOptions.map((option) => (
@@ -132,18 +134,19 @@ export default function IconPositionSelect({ value, onChange }) {
                     alignItems: "center",
                     gap: 0.5,
                     border: "1px solid #e3e3e3",
-                    p: 2,
+                    p: { xs: 1.5, sm: 2 },
                     borderRadius: "10px",
                     backgroundColor:
                       value === option.value ? "#f1f1f1" : "white",
+                    minWidth: { xs: "100px", sm: "auto" },
                   }}
                 >
                   <Box
                     sx={{
-                      width: 65,
-                      height: 40,
+                      width: { xs: 50, sm: 65 },
+                      height: { xs: 35, sm: 40 },
                       borderRadius: 2,
-                      bgcolor:"white",
+                      bgcolor: "white",
                       border:
                         value === option.value
                           ? "2px solid #25D366"
@@ -171,15 +174,20 @@ export default function IconPositionSelect({ value, onChange }) {
                   <Typography
                     variant="caption"
                     sx={{
-                      fontSize: "12px",
+                      fontSize: "11px",
                       color: "#757575",
                       display: { xs: "none", md: "block" },
+                      textAlign: "center",
                     }}
                   >
                     {option.description}
                   </Typography>
                 </Box>
               }
+              sx={{
+                ml: { xs: 0, sm: 1 },
+                mr: { xs: 1, sm: 2 },
+              }}
             />
           ))}
         </RadioGroup>

@@ -50,26 +50,28 @@ export default function LivePreview({
     <Paper
       elevation={3}
       sx={{
-        position: "sticky",
-        top: 20,
+        position: "relative",
+        top: 0,
         borderRadius: 3,
         overflow: "hidden",
+        width: "100%",
       }}
     >
       {/* Header with title and info */}
       <Box
         sx={{
           bgcolor: "#ffffff",
-          py: 1.5,
-          px: 2,
+          py: { xs: 1, sm: 1.5 },
+          px: { xs: 1.5, sm: 2 },
           display: "flex",
           alignItems: "center",
           gap: "10px",
+          flexWrap: { xs: "wrap", sm: "nowrap" },
         }}
       >
         <Typography
           variant="h2"
-          sx={{ fontSize: "14px" }}
+          sx={{ fontSize: { xs: "13px", sm: "14px" } }}
           fontWeight={650}
           color="black"
         >
@@ -81,6 +83,7 @@ export default function LivePreview({
             py: 0.2,
             backgroundColor: "#d5ebff",
             borderRadius: "5rem",
+            display: { xs: "none", sm: "block" },
           }}
         >
           <Typography
@@ -93,19 +96,25 @@ export default function LivePreview({
             Updates in real-time
           </Typography>
         </Box>
-        <InfoOutlined sx={{ color: "white", fontSize: 20 }} />
+        <InfoOutlined
+          sx={{
+            color: "white",
+            fontSize: 20,
+            display: { xs: "none", sm: "block" },
+          }}
+        />
       </Box>
 
       {/* Info text */}
       <Box
         sx={{
-          px: 2,
+          px: { xs: 1.5, sm: 2 },
         }}
       >
         <Typography
           sx={{
             color: "#666",
-            fontSize: "12px",
+            fontSize: "11px",
           }}
         >
           See how your button will appear on your store
@@ -118,13 +127,15 @@ export default function LivePreview({
         <Tabs
           value={viewMode}
           onChange={(e, newValue) => setViewMode(newValue)}
-          centered
+          variant={window.innerWidth < 600 ? "fullWidth" : "standard"}
+          centered={window.innerWidth >= 600}
           sx={{
-            minHeight: 36,
+            minHeight: { xs: 32, sm: 36 },
             "& .MuiTab-root": {
-              minHeight: 36,
+              minHeight: { xs: 32, sm: 36 },
               py: 0.5,
               fontSize: "12px",
+              px: { xs: 1, sm: 2 },
             },
           }}
         >
@@ -136,10 +147,13 @@ export default function LivePreview({
       {/* Preview Area */}
       <Box
         sx={{
-          py: 2,
-          px: 3,
+          py: { xs: 1.5, sm: 2 },
+          px: { xs: 1.5, sm: 3 },
           bgcolor: "#f5f5f5",
-          minHeight: viewMode === "desktop" ? 300 : 400,
+          minHeight:
+            viewMode === "desktop"
+              ? { xs: 250, sm: 300 }
+              : { xs: 350, sm: 400 },
           display: "flex",
           flexDirection: "column",
         }}
@@ -222,25 +236,27 @@ export default function LivePreview({
             <Box
               sx={{
                 position: "absolute",
-                bottom: 8,
-                [isLeft ? "left" : "right"]: 8,
+                bottom: { xs: 4, sm: 8 },
+                [isLeft ? "left" : "right"]: { xs: 4, sm: 8 },
               }}
             >
               <Box
                 sx={{
-                  width: isIconWithText ? "auto" : 50,
-                  height: 50,
+                  width: isIconWithText
+                    ? { xs: "auto", sm: "auto" }
+                    : { xs: 40, sm: 50 },
+                  height: { xs: 40, sm: 50 },
                   bgcolor: "#25D366",
                   borderRadius: isIconWithText ? "25px" : "50%",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   gap: isIconWithText ? 1 : 0,
-                  mx: isIconWithText ? "0.50rem" : 1,
                   boxShadow: "0 4px 12px rgba(37, 211, 102, 0.3)",
                   px: isIconWithText ? 1.5 : 0,
+                  mx: isIconWithText ? "0.50rem" : 1,
                   cursor: "pointer",
-                  marginBottom: "15px",
+                  marginBottom: { xs: "10px", sm: "15px" },
                 }}
                 title={getWhatsAppUrl()}
               >
@@ -248,8 +264,12 @@ export default function LivePreview({
                   src={getIconSrc(customIcon)}
                   alt="WhatsApp"
                   style={{
-                    width: isIconWithText ? 35 : 28,
-                    height: isIconWithText ? 40 : 28,
+                    width: isIconWithText
+                      ? { xs: 28, sm: 35 }
+                      : { xs: 22, sm: 28 },
+                    height: isIconWithText
+                      ? { xs: 32, sm: 40 }
+                      : { xs: 22, sm: 28 },
                     objectFit: "contain",
                   }}
                 />
@@ -258,7 +278,7 @@ export default function LivePreview({
                     sx={{
                       color: "white",
                       fontWeight: 700,
-                      fontSize: "12px",
+                      fontSize: { xs: "10px", sm: "12px" },
                       whiteSpace: "nowrap",
                       pr: 0.5,
                     }}
@@ -281,7 +301,10 @@ export default function LivePreview({
               flexDirection: "column",
               overflow: "hidden",
               position: "relative",
-              marginLeft: "10px",
+              marginLeft: { md: "10px" },
+              marginRight: {
+                md: "10px",
+              },
             }}
           >
             {/* Mobile Header */}
@@ -348,14 +371,16 @@ export default function LivePreview({
             <Box
               sx={{
                 position: "absolute",
-                bottom: 8,
-                [isLeft ? "left" : "right"]: 8,
+                bottom: { xs: 4, sm: 8 },
+                [isLeft ? "left" : "right"]: { xs: 4, sm: 8 },
               }}
             >
               <Box
                 sx={{
-                  width: isIconWithText ? "auto" : 50,
-                  height: 50,
+                  width: isIconWithText
+                    ? { xs: "auto", sm: "auto" }
+                    : { xs: 40, sm: 50 },
+                  height: { xs: 40, sm: 50 },
                   bgcolor: "#25D366",
                   borderRadius: isIconWithText ? "25px" : "50%",
                   display: "flex",
@@ -366,7 +391,7 @@ export default function LivePreview({
                   px: isIconWithText ? 1.5 : 0,
                   mx: isIconWithText ? "0.50rem" : 1,
                   cursor: "pointer",
-                  marginBottom: "15px",
+                  marginBottom: { xs: "10px", sm: "15px" },
                 }}
                 title={getWhatsAppUrl()}
               >
@@ -374,8 +399,12 @@ export default function LivePreview({
                   src={getIconSrc(customIcon)}
                   alt="WhatsApp"
                   style={{
-                    width: isIconWithText ? 35 : 28,
-                    height: isIconWithText ? 40 : 28,
+                    width: isIconWithText
+                      ? { xs: 28, sm: 35 }
+                      : { xs: 22, sm: 28 },
+                    height: isIconWithText
+                      ? { xs: 32, sm: 40 }
+                      : { xs: 22, sm: 28 },
                     objectFit: "contain",
                   }}
                 />
@@ -384,7 +413,7 @@ export default function LivePreview({
                     sx={{
                       color: "white",
                       fontWeight: 700,
-                      fontSize: "12px",
+                      fontSize: { xs: "10px", sm: "12px" },
                       whiteSpace: "nowrap",
                       pr: 0.5,
                     }}

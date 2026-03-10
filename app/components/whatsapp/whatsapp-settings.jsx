@@ -79,29 +79,30 @@ export default function WhatsAppSettings({
     }
   };
 
-
   return (
     <Box
       sx={{
-        width: "calc(100vw - 56px)",
-        ml: "calc(-50vw + 50% + 16px)",
-        px: 2,
-        mt: "24px",
+        width: "100%",
+        maxWidth: { xs: "100%", sm: "600px" },
+        mx: "auto",
+        px: { xs: 2, sm: 3 },
+        mt: { xs: 2, sm: "24px" },
       }}
     >
-      <Paper elevation={4} sx={{ p: 4, borderRadius: 3, mt: 3 }}>
+      <Paper elevation={4} sx={{ p: { xs: 2, sm: 4 }, borderRadius: 3, mt: 3 }}>
         <Typography
           variant="h5"
           color="primary"
           fontWeight={700}
           mb={3}
           textAlign="center"
+          sx={{ fontSize: { xs: "1.25rem", sm: "1.5rem" } }}
         >
           WhatsApp Settings
         </Typography>
 
         <Stack spacing={3}>
-          <Paper sx={{ p: 3, bgcolor: "grey.50" }}>
+          <Paper sx={{ p: { xs: 2, sm: 3 }, bgcolor: "grey.50" }}>
             <Stack spacing={2}>
               <TextField
                 fullWidth
@@ -117,7 +118,10 @@ export default function WhatsAppSettings({
               <FormControl component="fieldset">
                 <FormLabel
                   component="legend"
-                  sx={{ fontSize: "1rem", fontWeight: 600 }}
+                  sx={{
+                    fontSize: { xs: "0.9rem", sm: "1rem" },
+                    fontWeight: 600,
+                  }}
                 >
                   Chat Icon Position
                 </FormLabel>
@@ -125,7 +129,7 @@ export default function WhatsAppSettings({
                   row
                   value={tempIconPosition}
                   onChange={(e) => setTempIconPosition(e.target.value)}
-                  sx={{ mt: 1 }}
+                  sx={{ mt: 1, flexWrap: "wrap", gap: 1 }}
                 >
                   <FormControlLabel
                     value="left"
@@ -143,7 +147,10 @@ export default function WhatsAppSettings({
               <FormControl component="fieldset">
                 <FormLabel
                   component="legend"
-                  sx={{ fontSize: "1rem", fontWeight: 600 }}
+                  sx={{
+                    fontSize: { xs: "0.9rem", sm: "1rem" },
+                    fontWeight: 600,
+                  }}
                 >
                   Custom Chat Icon
                 </FormLabel>
@@ -151,7 +158,7 @@ export default function WhatsAppSettings({
                   row
                   value={tempCustomIcon}
                   onChange={(e) => setTempCustomIcon(e.target.value)}
-                  sx={{ mt: 2, gap: 2 }}
+                  sx={{ mt: 2, gap: 2, flexWrap: "wrap" }}
                 >
                   {[
                     {
@@ -206,7 +213,10 @@ export default function WhatsAppSettings({
               <FormControl component="fieldset">
                 <FormLabel
                   component="legend"
-                  sx={{ fontSize: "1rem", fontWeight: 600 }}
+                  sx={{
+                    fontSize: { xs: "0.9rem", sm: "1rem" },
+                    fontWeight: 600,
+                  }}
                 >
                   Chat Icon Style
                 </FormLabel>
@@ -214,7 +224,7 @@ export default function WhatsAppSettings({
                   row
                   value={tempButtonStyle}
                   onChange={(e) => setTempButtonStyle(e.target.value)}
-                  sx={{ mt: 2, gap: 4 }}
+                  sx={{ mt: 2, gap: { xs: 2, sm: 4 }, flexWrap: "wrap" }}
                 >
                   <FormControlLabel
                     value="icon_only"
@@ -304,7 +314,10 @@ export default function WhatsAppSettings({
                   startIcon={
                     settingsLoading ? <CircularProgress size={20} /> : null
                   }
-                  sx={{ textTransform: "none" }}
+                  sx={{
+                    textTransform: "none",
+                    width: { xs: "100%", sm: "auto" },
+                  }}
                 >
                   Save Changes
                 </Button>
