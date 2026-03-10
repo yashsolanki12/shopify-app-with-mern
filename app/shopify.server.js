@@ -32,8 +32,7 @@ export async function registerAppUninstalledWebhook(session) {
   const response = await shopify.webhook.register({
     session,
     topic: "APP_UNINSTALLED",
-    address:
-      "https://whatsapp-mern-backend-sidn.onrender.com/api/shopify/webhook",
+    address: "https://ecswhatsup-backend.ecodesoft.net/api/shopify/webhook",
     format: "json",
   });
   if (response.success) {
