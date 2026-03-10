@@ -44,8 +44,8 @@ export default function IconStyleSelect({ value, onChange, getIconSrc }) {
               >
                 <Box
                   sx={{
-                    width: { xs: 40, sm: 45 },
-                    height: { xs: 40, sm: 45 },
+                    width: { xs: "43px", sm: "45px" },
+                    height: { xs: "43px", sm: "45px" },
                     backgroundColor: "#25D366",
                     borderRadius: "50%",
                     display: "flex",
@@ -57,7 +57,7 @@ export default function IconStyleSelect({ value, onChange, getIconSrc }) {
                   <img
                     src={getIconSrc("whatsapp")}
                     alt="Chat"
-                    style={{ width: "20px", height: "20px" }}
+                    style={{ width: "25px", height: "25px" }}
                   />
                 </Box>
               </Box>
@@ -87,7 +87,7 @@ export default function IconStyleSelect({ value, onChange, getIconSrc }) {
                 <img
                   src={getIconSrc("whatsapp")}
                   alt="Chat"
-                  style={{ width: "18px", height: "18px" }}
+                  style={{ width: "25px", height: "25px" }}
                 />
                 <Typography
                   sx={{

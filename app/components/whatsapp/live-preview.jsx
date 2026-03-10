@@ -244,8 +244,8 @@ export default function LivePreview({
                 sx={{
                   width: isIconWithText
                     ? { xs: "auto", sm: "auto" }
-                    : { xs: 40, sm: 50 },
-                  height: { xs: 40, sm: 50 },
+                    : { xs: 46, sm: 46 },
+                  height: { xs: 46, sm: 46 },
                   bgcolor: "#25D366",
                   borderRadius: isIconWithText ? "25px" : "50%",
                   display: "flex",
@@ -264,12 +264,8 @@ export default function LivePreview({
                   src={getIconSrc(customIcon)}
                   alt="WhatsApp"
                   style={{
-                    width: isIconWithText
-                      ? { xs: 28, sm: 35 }
-                      : { xs: 22, sm: 28 },
-                    height: isIconWithText
-                      ? { xs: 32, sm: 40 }
-                      : { xs: 22, sm: 28 },
+                    width: isIconWithText ? "30px" : "30px",
+                    height: isIconWithText ? "32px" : "30px",
                     objectFit: "contain",
                   }}
                 />
@@ -278,7 +274,7 @@ export default function LivePreview({
                     sx={{
                       color: "white",
                       fontWeight: 700,
-                      fontSize: { xs: "10px", sm: "12px" },
+                      fontSize: { xs: "13px", sm: "12px" },
                       whiteSpace: "nowrap",
                       pr: 0.5,
                     }}
@@ -379,8 +375,8 @@ export default function LivePreview({
                 sx={{
                   width: isIconWithText
                     ? { xs: "auto", sm: "auto" }
-                    : { xs: 40, sm: 50 },
-                  height: { xs: 40, sm: 50 },
+                    : { xs: 46, sm: 46 },
+                  height: { xs: 46, sm: 46 },
                   bgcolor: "#25D366",
                   borderRadius: isIconWithText ? "25px" : "50%",
                   display: "flex",
@@ -399,12 +395,8 @@ export default function LivePreview({
                   src={getIconSrc(customIcon)}
                   alt="WhatsApp"
                   style={{
-                    width: isIconWithText
-                      ? { xs: 28, sm: 35 }
-                      : { xs: 22, sm: 28 },
-                    height: isIconWithText
-                      ? { xs: 32, sm: 40 }
-                      : { xs: 22, sm: 28 },
+                    width: isIconWithText ? "30px" : "30px",
+                    height: isIconWithText ? "32px" : "30px",
                     objectFit: "contain",
                   }}
                 />
@@ -413,7 +405,7 @@ export default function LivePreview({
                     sx={{
                       color: "white",
                       fontWeight: 700,
-                      fontSize: { xs: "10px", sm: "12px" },
+                      fontSize: { xs: "13px", sm: "12px" },
                       whiteSpace: "nowrap",
                       pr: 0.5,
                     }}
