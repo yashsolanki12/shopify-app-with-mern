@@ -45,6 +45,7 @@ export default function CustomIconSelect({ value, onChange, icons }) {
                     alignItems: "center",
                     gap: 0.5,
                     minWidth: { xs: "60px", sm: "auto" },
+                    width: "max-content",
                   }}
                 >
                   <Box
@@ -76,6 +77,7 @@ export default function CustomIconSelect({ value, onChange, icons }) {
                   </Box>
                   <Typography
                     variant="caption"
+                    width="fit-content"
                     sx={{ fontSize: { xs: "10px", sm: "12px" } }}
                   >
                     {icon.label}
