@@ -208,169 +208,180 @@ export default function WhatsAppSettingsDesign({
   }
 
   return (
-    <Box
-      sx={{
-        width: "100%",
-        maxWidth: { xs: "100%", md: "1200px" },
-        mx: "auto",
-        // px: { xs: 2, md: 3 },
-        // py: 3,
-        // p: 1,
-      }}
-    >
-      {/* Header Section */}
-      <Box mb={4}>
-        <Typography
-          variant="h4"
-          sx={{ fontSize: "20px" }}
-          fontWeight={650}
-          mb={1}
-        >
-          Settings
-        </Typography>
-        <Typography
-          variant="body1"
-          sx={{ fontSize: "13px" }}
-          color="textSecondary"
-          mb={3}
-          fontWeight={450}
-        >
-          Configure your WhatsApp chat button to match your store's needs.
-        </Typography>
-      </Box>
-
-      {/* Settings Layout - Side by Side */}
+    <Box sx={{ p: 2 }}>
       <Box
         sx={{
-          display: "flex",
-          gap: 4,
-          flexDirection: { xs: "column-reverse", md: "row" },
+          width: "100%",
+          maxWidth: { xs: "100%", md: "1200px" },
+          mx: "auto",
+          // px: { xs: 2, sm: 3 },
+          // py: { xs: 2, md: 3 },
         }}
       >
-        {/* Settings Column */}
-        <Box sx={{ flex: 1, marginTop: "5px", minWidth: 0 }}>
-          {/* General Section */}
-          <Box mb={4}>
-            <Typography
-              variant="h2"
-              sx={{ fontSize: "14px" }}
-              fontWeight={600}
-              mb={0.5}
-            >
-              General
-            </Typography>
-            <Typography
-              variant="subtitle2"
-              sx={{ fontSize: "13px" }}
-              fontWeight={450}
-              color="textSecondary"
-              mb={3}
-            >
-              <p>Basic settings for your WhatsApp Button.</p>
-            </Typography>
-            <MessageInput value={tempMessage} onChange={setTempMessage} />
-          </Box>
-
-          {/* Appearance Section */}
-          <Box mb={4} mt={6}>
-            <Typography
-              variant="h2"
-              sx={{ fontSize: "14px" }}
-              fontWeight={600}
-              mb={0.5}
-            >
-              Appearance
-            </Typography>
-            <Typography
-              variant="subtitle2"
-              sx={{ fontSize: "13px" }}
-              fontWeight={450}
-              color="textSecondary"
-              mb={3}
-            >
-              <p>Customize how your button looks and where it appears.</p>
-            </Typography>
-            <IconPositionSelect
-              value={tempIconPosition}
-              onChange={setTempIconPosition}
-            />
-            <CustomIconSelect
-              value={tempCustomIcon}
-              onChange={setTempCustomIcon}
-              icons={[
-                { value: "whatsapp", label: "WhatsApp", src: "/whatsapp.png" },
-                {
-                  value: "chat1",
-                  label: "Chat Bubble",
-                  src: "/chat-icon-1.svg",
-                },
-                {
-                  value: "chat2",
-                  label: "Message Icon",
-                  src: "/chat-icon-2.svg",
-                },
-                {
-                  value: "chat3",
-                  label: "Chat Circle",
-                  src: "/chat-icon-3.svg",
-                },
-              ]}
-            />
-            <IconStyleSelect
-              value={tempButtonStyle}
-              onChange={setTempButtonStyle}
-              getIconSrc={getIconSrc}
-            />
-          </Box>
-
-          <Box display="flex" mt={3}>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleUpdateSettings}
-              disabled={settingsLoading}
-              startIcon={
-                settingsLoading ? <CircularProgress size={20} /> : null
-              }
-              sx={{
-                textTransform: "none",
-                px: 2,
-                py: 1,
-                fontSize: "0.85rem",
-              }}
-            >
-              Save Changes
-            </Button>
-          </Box>
+        {/* Header Section */}
+        <Box mb={{ xs: 3, md: 4 }}>
+          <Typography
+            variant="h4"
+            sx={{ fontSize: { xs: "18px", sm: "20px" } }}
+            fontWeight={650}
+            mb={1}
+          >
+            Settings
+          </Typography>
+          <Typography
+            variant="body1"
+            sx={{ fontSize: { xs: "12px", sm: "13px" } }}
+            color="textSecondary"
+            mb={3}
+            fontWeight={450}
+          >
+            Configure your WhatsApp chat button to match your store's needs.
+          </Typography>
         </Box>
 
-        {/* Live Preview Column */}
+        {/* Settings Layout - Side by Side */}
         <Box
           sx={{
-            width: { xs: "100%", md: "350px" },
-            flexShrink: 0,
+            display: "flex",
+            gap: { xs: 2, md: 4 },
+            flexDirection: { xs: "column-reverse", md: "row" },
           }}
         >
-          <LivePreview
-            iconPosition={tempIconPosition}
-            buttonStyle={tempButtonStyle}
-            customIcon={tempCustomIcon}
-            phoneData={phoneData}
-          />
-        </Box>
-      </Box>
+          {/* Settings Column */}
+          <Box
+            sx={{ flex: 1, marginTop: { xs: "5px", md: "5px" }, minWidth: 0 }}
+          >
+            {/* General Section */}
+            <Box mb={{ xs: 3, md: 4 }}>
+              <Typography
+                variant="h2"
+                sx={{ fontSize: "14px" }}
+                fontWeight={600}
+                mb={0.5}
+              >
+                General
+              </Typography>
+              <Typography
+                variant="subtitle2"
+                sx={{ fontSize: "13px" }}
+                fontWeight={450}
+                color="textSecondary"
+                mb={3}
+              >
+                <p>Basic settings for your WhatsApp Button.</p>
+              </Typography>
+              <MessageInput value={tempMessage} onChange={setTempMessage} />
+            </Box>
 
-      {/* Snackbar for notifications */}
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={3000}
-        onClose={() => setSnackbar({ ...snackbar, open: false })}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-      >
-        <Alert severity={snackbar.severity} sx={{ width: "100%" }}>
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
+            {/* Appearance Section */}
+            <Box mb={{ xs: 3, md: 4 }} mt={{ xs: 4, md: 6 }}>
+              <Typography
+                variant="h2"
+                sx={{ fontSize: "14px" }}
+                fontWeight={600}
+                mb={0.5}
+              >
+                Appearance
+              </Typography>
+              <Typography
+                variant="subtitle2"
+                sx={{ fontSize: "13px" }}
+                fontWeight={450}
+                color="textSecondary"
+                mb={3}
+              >
+                <p>Customize how your button looks and where it appears.</p>
+              </Typography>
+              <IconPositionSelect
+                value={tempIconPosition}
+                onChange={setTempIconPosition}
+              />
+              <CustomIconSelect
+                value={tempCustomIcon}
+                onChange={setTempCustomIcon}
+                icons={[
+                  {
+                    value: "whatsapp",
+                    label: "WhatsApp",
+                    src: "/whatsapp.png",
+                  },
+                  {
+                    value: "chat1",
+                    label: "Chat Bubble",
+                    src: "/chat-icon-1.svg",
+                  },
+                  {
+                    value: "chat2",
+                    label: "Message Icon",
+                    src: "/chat-icon-2.svg",
+                  },
+                  {
+                    value: "chat3",
+                    label: "Chat Circle",
+                    src: "/chat-icon-3.svg",
+                  },
+                ]}
+              />
+              <IconStyleSelect
+                value={tempButtonStyle}
+                onChange={setTempButtonStyle}
+                getIconSrc={getIconSrc}
+              />
+            </Box>
+
+            <Box display="flex" mt={3}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleUpdateSettings}
+                disabled={settingsLoading}
+                startIcon={
+                  settingsLoading ? <CircularProgress size={20} /> : null
+                }
+                sx={{
+                  textTransform: "none",
+                  px: 2,
+                  py: 1,
+                  fontSize: "0.85rem",
+                  width: { xs: "100%", sm: "auto" },
+                }}
+              >
+                Save Changes
+              </Button>
+            </Box>
+          </Box>
+
+          {/* Live Preview Column */}
+          <Box
+            sx={{
+              width: { xs: "100%", md: "350px" },
+              flexShrink: 0,
+              position: { xs: "relative", md: "sticky" },
+              top: { xs: 0, md: 20 },
+              mb: { xs: 2, md: 0 },
+            }}
+          >
+            <LivePreview
+              iconPosition={tempIconPosition}
+              buttonStyle={tempButtonStyle}
+              customIcon={tempCustomIcon}
+              phoneData={phoneData}
+            />
+          </Box>
+        </Box>
+
+        {/* Snackbar for notifications */}
+        <Snackbar
+          open={snackbar.open}
+          autoHideDuration={3000}
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        >
+          <Alert severity={snackbar.severity} sx={{ width: "100%" }}>
+            {snackbar.message}
+          </Alert>
+        </Snackbar>
+      </Box>
     </Box>
   );
 }
