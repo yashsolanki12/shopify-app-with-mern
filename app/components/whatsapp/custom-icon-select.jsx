@@ -25,9 +25,11 @@ export default function CustomIconSelect({ value, onChange, icons }) {
           onChange={(e) => onChange(e.target.value)}
           sx={{
             display: "flex",
-            flexWrap: "wrap",
-            gap: 2,
+            flexWrap: { xs: "nowrap", sm: "wrap" },
+            gap: { xs: 1, sm: 2 },
             justifyContent: "flex-start",
+            overflowX: { xs: "auto", sm: "visible" },
+            pb: { xs: 1, sm: 0 },
           }}
         >
           {icons.map((icon) => (
@@ -42,12 +44,13 @@ export default function CustomIconSelect({ value, onChange, icons }) {
                     flexDirection: "column",
                     alignItems: "center",
                     gap: 0.5,
+                    minWidth: { xs: "60px", sm: "auto" },
                   }}
                 >
                   <Box
                     sx={{
-                      width: 30,
-                      height: 30,
+                      width: { xs: "35px", sm: "25px" },
+                      height: { xs: "35px", sm: "25px" },
                       borderRadius: "50%",
                       bgcolor: value === icon.value ? "#e8f5e9" : "transparent",
                       border:
@@ -71,9 +74,18 @@ export default function CustomIconSelect({ value, onChange, icons }) {
                       }}
                     />
                   </Box>
-                  <Typography variant="caption">{icon.label}</Typography>
+                  <Typography
+                    variant="caption"
+                    sx={{ fontSize: { xs: "10px", sm: "12px" } }}
+                  >
+                    {icon.label}
+                  </Typography>
                 </Box>
               }
+              sx={{
+                ml: { xs: 0, sm: 1 },
+                mr: { xs: 1, sm: 2 },
+              }}
             />
           ))}
         </RadioGroup>

@@ -27,20 +27,25 @@ export default function IconStyleSelect({ value, onChange, getIconSrc }) {
           onChange={(e) => onChange(e.target.value)}
           sx={{
             display: "flex",
-            flexWrap: "wrap",
-            gap: 3,
+            flexWrap: { xs: "nowrap", sm: "wrap" },
+            gap: { xs: 1, sm: 3 },
             justifyContent: "flex-start",
+            overflowX: { xs: "auto", sm: "visible" },
+            pb: { xs: 1, sm: 0 },
           }}
         >
           <FormControlLabel
             value="icon_only"
             control={<Radio />}
             label={
-              <Box sx={{ display: "flex", alignItems: "center" }}>
+              <Box
+                sx={{ display: "flex", alignItems: "center" }}
+                title="Icon Only"
+              >
                 <Box
                   sx={{
-                    width: 45,
-                    height: 45,
+                    width: { xs: 40, sm: 45 },
+                    height: { xs: 40, sm: 45 },
                     backgroundColor: "#25D366",
                     borderRadius: "50%",
                     display: "flex",
@@ -52,11 +57,15 @@ export default function IconStyleSelect({ value, onChange, getIconSrc }) {
                   <img
                     src={getIconSrc("whatsapp")}
                     alt="Chat"
-                    style={{ width: "24px", height: "24px" }}
+                    style={{ width: "20px", height: "20px" }}
                   />
                 </Box>
               </Box>
             }
+            sx={{
+              ml: { xs: 0, sm: 1 },
+              mr: { xs: 1, sm: 2 },
+            }}
           />
           <FormControlLabel
             value="icon_with_text"
@@ -68,22 +77,23 @@ export default function IconStyleSelect({ value, onChange, getIconSrc }) {
                   alignItems: "center",
                   backgroundColor: "#25D366",
                   borderRadius: "25px",
-                  px: 2,
+                  px: { xs: 1.5, sm: 2 },
                   py: 1,
                   gap: 1,
                   boxShadow: "0 2px 8px rgba(37, 211, 102, 0.2)",
+                  maxWidth: { xs: "140px", sm: "auto" },
                 }}
               >
                 <img
                   src={getIconSrc("whatsapp")}
                   alt="Chat"
-                  style={{ width: "20px", height: "20px" }}
+                  style={{ width: "18px", height: "18px" }}
                 />
                 <Typography
                   sx={{
                     color: "white",
                     fontWeight: 700,
-                    fontSize: "14px",
+                    fontSize: "12px",
                     whiteSpace: "nowrap",
                   }}
                 >
@@ -91,6 +101,10 @@ export default function IconStyleSelect({ value, onChange, getIconSrc }) {
                 </Typography>
               </Box>
             }
+            sx={{
+              ml: { xs: 0, sm: 1 },
+              mr: { xs: 1, sm: 2 },
+            }}
           />
         </RadioGroup>
       </CardContent>

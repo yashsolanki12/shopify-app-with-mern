@@ -13,7 +13,7 @@ export default function MessageInput({ value, onChange }) {
           variant="h2"
           sx={{ fontSize: "14px", paddingBottom: "5px" }}
           fontWeight={600}
-          mb={3.5}
+          mb={{ xs: 2, sm: 3.5 }}
         >
           Message Settings
         </Typography>
@@ -26,6 +26,14 @@ export default function MessageInput({ value, onChange }) {
           multiline
           rows={2}
           inputProps={{ maxLength: 50 }}
+          sx={{
+            "& .MuiOutlinedInput-root": {
+              fontSize: { xs: "14px", sm: "inherit" },
+            },
+            "& .MuiInputLabel-root": {
+              fontSize: { xs: "14px", sm: "inherit" },
+            },
+          }}
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">

@@ -133,7 +133,7 @@ export default function Settings() {
   const session = data?.session;
 
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={""}>
       <WhatsAppSettingsDesign
         initialSettings={data?.initialSettings || {}}
         appEmbedEnabled={appEmbedEnabled}
