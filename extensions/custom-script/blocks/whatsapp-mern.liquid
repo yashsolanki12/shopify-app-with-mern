@@ -63,6 +63,57 @@
   {{ 'whatsapp-logo.css' | asset_url | stylesheet_tag }}
   <script>
     document.addEventListener('DOMContentLoaded', function() {
+      // Get page display setting from block settings (fallback)
+      let pageDisplay = "{{ block.settings.page_display | escape }}";
+      
+      // Function to check if current page matches the display setting
+      function shouldShowWidget(pageDisplaySetting) {
+        const path = window.location.pathname;
+        const hostname = window.location.hostname;
+        
+        // Always show in theme editor
+        if (window.Shopify && window.Shopify.designMode) {
+          return true;
+        }
+        
+        // Handle array of page_display values (new format)
+        if (Array.isArray(pageDisplaySetting)) {
+          // If "all" is in the array, show on all pages
+          if (pageDisplaySetting.includes('all')) {
+            return true;
+          }
+          // Check if any of the selected pages match the current page
+          return pageDisplaySetting.some(setting => matchesPage(path, setting));
+        }
+        
+        // Handle single string value (legacy format)
+        const displaySetting = pageDisplaySetting || pageDisplay || 'all';
+        return matchesPage(path, displaySetting);
+      }
+      
+      // Helper function to check if path matches the display setting
+      function matchesPage(path, setting) {
+        switch(setting) {
+          case 'all':
+            return true;
+          case 'home':
+            return path === '/' || path === '/index' || path === '/index.liquid';
+          case 'products':
+            return path.includes('/products') || path.includes('/search');
+          case 'catalog': 
+            return path.includes('/collections') || path.includes('/collections/all');
+          case 'contact':
+            return path.includes('/pages/contact') || path.includes('/contact');
+          default:
+            return true;
+        }
+      }
+      
+      // Check if we should display on this page (using block settings initially)
+      if (!shouldShowWidget()) {
+        return; // Don't initialize or show widget on this page
+      }
+
       // Asset URLs for dynamic icon switching
       const assets = {
         'whatsapp': "{{ 'whatsapp.png' | asset_url }}",
@@ -107,6 +158,15 @@
             const textElement = document.getElementById('whatsapp-text');
             const iconMain = document.getElementById('whatsapp-icon-img-main');
             const iconWidget = document.getElementById('whatsapp-icon-img-widget');
+            
+            // Get page_display from API if available (handle both array and string formats)
+            const apiPageDisplay = phoneData.page_display || pageDisplay || ["all"];
+            
+            // Check if we should display on this page using API page_display
+            if (!shouldShowWidget(apiPageDisplay)) {
+              if (wrapper) wrapper.style.display = 'none';
+              return;
+            }
             
             // Show wrapper as we have data
             if (wrapper) wrapper.style.display = 'block';
