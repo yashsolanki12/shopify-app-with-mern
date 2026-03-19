@@ -27,6 +27,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { FormLabel } from "@mui/material";
 
 import { phoneSchema } from "../validation/phone.schema";
+import CountryCodeSelect from "../components/phone/CountryCodeSelect";
 // const PhoneModal = lazy(() => import("../components/phone/phone-modal"));
 
 export default function PhoneListPage({
@@ -363,66 +364,66 @@ export default function PhoneListPage({
           </Stack>
         ) : (
           <Stack spacing={3}>
-            <TextField
-              fullWidth
-              label="Country Code"
-              value={form.country_code}
-              onChange={(e) => {
-                setForm((prev) => ({ ...prev, country_code: e.target.value }));
-                if (formErrors.country_code) {
-                  setFormErrors((prev) => ({ ...prev, country_code: "" }));
-                }
+            <Box
+              sx={{
+                display: "flex",
+                gap: 0,
+                alignItems: "flex-start",
               }}
-              placeholder="e.g. +1, +41"
-              error={!!formErrors.country_code}
-              helperText={
-                formErrors.country_code
-                  ? formErrors.country_code
-                  : "Country code must start with '+', " +
-                    "1 to 4 digits (e.g., +91)."
-              }
-              inputProps={{ maxLength: 5 }}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <Typography variant="caption" color="textSecondary">
-                      {form.country_code?.length || 0}/5
-                    </Typography>
-                  </InputAdornment>
-                ),
-              }}
-              //
-            />
-
-            <TextField
-              fullWidth
-              label="Phone Number"
-              value={form.phone_number}
-              onChange={(e) => {
-                setForm((prev) => ({ ...prev, phone_number: e.target.value }));
-                if (formErrors.phone_number) {
-                  setFormErrors((prev) => ({ ...prev, phone_number: "" }));
-                }
-              }}
-              placeholder="e.g. 8265683421"
-              type="text"
-              error={!!formErrors.phone_number}
-              helperText={
-                formErrors.phone_number
-                  ? formErrors.phone_number
-                  : 'No leading "+", for example: 1234567890.'
-              }
-              inputProps={{ maxLength: 15 }}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <Typography variant="caption" color="textSecondary">
-                      {form.phone_number?.length || 0}/15
-                    </Typography>
-                  </InputAdornment>
-                ),
-              }}
-            />
+            >
+              <Box sx={{ width: "160px", flexShrink: 0, width: "fit-content" }}>
+                <Typography variant="body2" sx={{ mb: 0.5, fontWeight: 500 }}>
+                  Country Code
+                </Typography>
+                <CountryCodeSelect
+                  value={form.country_code}
+                  onChange={(code) => {
+                    setForm((prev) => ({ ...prev, country_code: code }));
+                    if (formErrors.country_code) {
+                      setFormErrors((prev) => ({ ...prev, country_code: "" }));
+                    }
+                  }}
+                  error={!!formErrors.country_code}
+                />
+              </Box>
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="body2" sx={{ mb: 0.5, fontWeight: 500 }}>
+                  Phone Number
+                </Typography>
+                <TextField
+                  fullWidth
+                  value={form.phone_number}
+                  onChange={(e) => {
+                    setForm((prev) => ({
+                      ...prev,
+                      phone_number: e.target.value,
+                    }));
+                    if (formErrors.phone_number) {
+                      setFormErrors((prev) => ({ ...prev, phone_number: "" }));
+                    }
+                  }}
+                  placeholder="e.g. 8265683421"
+                  type="text"
+                  error={!!formErrors.phone_number}
+                  helperText={
+                    formErrors.phone_number
+                      ? formErrors.phone_number
+                      : 'No leading "+", for example: 1234567890.'
+                  }
+                  inputProps={{ maxLength: 15 }}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <Typography variant="caption" color="textSecondary">
+                          {form.phone_number?.length || 0}/15
+                        </Typography>
+                      </InputAdornment>
+                    ),
+                  }}
+                  sx={{ height: "56px" }}
+                />
+              </Box>
+            </Box>
 
             <Box display="flex" gap={2} justifyContent="center">
               <Button
@@ -430,9 +431,7 @@ export default function PhoneListPage({
                 color="primary"
                 onClick={editMode ? handleSave : handleSave}
                 disabled={
-                  !form.phone_number.trim() ||
-                  !form.country_code.trim() ||
-                  saveLoading
+                  !form.phone_number.trim() || saveLoading
                   // || deleteLoading
                 }
                 startIcon={saveLoading ? <CircularProgress size={20} /> : null}
