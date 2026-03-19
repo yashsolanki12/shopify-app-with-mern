@@ -15,6 +15,20 @@ import IconStyleSelect from "./icon-style-select";
 import LivePreview from "./live-preview";
 import { Container } from "@mui/material";
 import Loader from "../../components/skeleton/loader";
+import TextField from "@mui/material/TextField";
+import InputAdornment from "@mui/material/InputAdornment";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import CountryCodeSelect from "../phone/CountryCodeSelect";
+import { phoneSchema } from "../../validation/phone.schema";
+import { createPhone } from "../../api/phone";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import Checkbox from "@mui/material/Checkbox";
+import ListItemText from "@mui/material/ListItemText";
+import OutlinedInput from "@mui/material/OutlinedInput";
 
 export default function WhatsAppSettingsDesign({
   initialSettings = {},
@@ -61,6 +75,11 @@ export default function WhatsAppSettingsDesign({
 
   const phoneData = phoneResponse?.data || [];
 
+  const initialForm = { phone_number: "", country_code: "" };
+  const [form, setForm] = React.useState(initialForm);
+  const [formErrors, setFormErrors] = React.useState(initialForm);
+  const [selectedId, setSelectedId] = React.useState("");
+
   const [tempIconPosition, setTempIconPosition] = React.useState(
     initialSettings?.position || "right",
   );
@@ -73,6 +92,9 @@ export default function WhatsAppSettingsDesign({
   const [tempCustomIcon, setTempCustomIcon] = React.useState(
     initialSettings?.custom_icon || "whatsapp",
   );
+  const [tempPageDisplay, setTempPageDisplay] = React.useState(
+    initialSettings?.page_display || ["all"],
+  );
 
   React.useEffect(() => {
     if (phoneData?.length > 0) {
@@ -80,31 +102,73 @@ export default function WhatsAppSettingsDesign({
       if (firstPhone.position) setTempIconPosition(firstPhone.position);
       if (firstPhone.button_style) setTempButtonStyle(firstPhone.button_style);
       if (firstPhone.custom_icon) setTempCustomIcon(firstPhone.custom_icon);
+      if (firstPhone.page_display) {
+        // Handle both string and array formats for backwards compatibility
+        const pageDisplay = firstPhone.page_display;
+        if (Array.isArray(pageDisplay)) {
+          setTempPageDisplay(pageDisplay);
+        } else if (typeof pageDisplay === "string") {
+          setTempPageDisplay([pageDisplay]);
+        }
+      }
       if (firstPhone.message !== undefined) setTempMessage(firstPhone.message);
+
+      setForm({
+        phone_number: firstPhone.phone_number || "",
+        country_code: firstPhone.country_code || "",
+      });
+      setSelectedId(firstPhone._id);
     }
   }, [phoneData]);
 
   const handleUpdateSettings = async () => {
-    if (!phoneData?.length) return;
-    setSettingsLoading(true);
-    try {
-      const promises = phoneData.map(async (ele) => {
-        return await editPhone(ele._id, {
-          phone_number: ele.phone_number,
-          country_code: ele.country_code,
-          message: tempMessage,
-          position: tempIconPosition,
-          button_style: tempButtonStyle,
-          custom_icon: tempCustomIcon,
-        });
+    // Zod validation for phone
+    const result = phoneSchema.safeParse(form);
+    if (!result.success) {
+      // Initialize errors with empty strings for both fields
+      const errors = {
+        phone_number: "",
+        country_code: "",
+      };
+
+      result.error.issues.forEach((issue) => {
+        const fieldName = issue.path[0];
+        if (typeof fieldName === "string" && fieldName in errors) {
+          errors[fieldName] = issue.message;
+        }
       });
 
-      const responses = await Promise.all(promises);
+      setFormErrors(errors);
+      return;
+    }
 
-      if (responses.length > 0) {
+    // Clear form errors when validation passes
+    setFormErrors({ phone_number: "", country_code: "" });
+
+    setSettingsLoading(true);
+    try {
+      let response;
+      const payload = {
+        phone_number: form.phone_number,
+        country_code: form.country_code,
+        message: tempMessage,
+        position: tempIconPosition,
+        button_style: tempButtonStyle,
+        custom_icon: tempCustomIcon,
+        page_display: tempPageDisplay,
+      };
+
+      if (selectedId) {
+        response = await editPhone(selectedId, payload);
+      } else {
+        payload.shopify_session_id = sessionData?.session?._id;
+        response = await createPhone(payload);
+      }
+
+      if (response) {
         setSnackbar({
           open: true,
-          message: "WhatsApp settings updated successfully!",
+          message: "Settings saved successfully!",
           severity: "success",
         });
         onSettingsUpdate?.({
@@ -112,16 +176,28 @@ export default function WhatsAppSettingsDesign({
           position: tempIconPosition,
           button_style: tempButtonStyle,
           custom_icon: tempCustomIcon,
+          page_display: tempPageDisplay,
         });
         queryClient.invalidateQueries({ queryKey: ["phone"] });
       }
     } catch (error) {
+      const errorMessages = error.response?.data;
+      let message = "Failed to save settings";
+
+      if (Array.isArray(errorMessages) && errorMessages.length > 0) {
+        message = errorMessages.join(" | ");
+      } else if (errorMessages?.message) {
+        message = errorMessages.message;
+      } else if (error.message) {
+        message = error.message;
+      }
+
       setSnackbar({
         open: true,
-        message: "Failed to update WhatsApp settings",
+        message,
         severity: "error",
       });
-      onError?.("Failed to update WhatsApp settings");
+      onError?.(message);
     } finally {
       setSettingsLoading(false);
     }
@@ -145,19 +221,6 @@ export default function WhatsAppSettingsDesign({
     return <Loader />;
   }
 
-  if (!phoneData || phoneData.length === 0) {
-    return (
-      <Box sx={{ p: 3, textAlign: "center" }}>
-        <Typography variant="h6" color="textSecondary">
-          No Phone Number Configured
-        </Typography>
-        <Typography variant="body2" color="textSecondary">
-          Please add a phone number in the Phone section first to configure
-          WhatsApp settings.
-        </Typography>
-      </Box>
-    );
-  }
   if (!appEmbedEnabled) {
     return (
       <Container maxWidth="sm" sx={{ py: 4 }}>
@@ -179,8 +242,8 @@ export default function WhatsAppSettingsDesign({
             ⚠️ WhatsApp Widget is Currently Inactive
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            To display WhatsApp widget on your storefront, please complete the
-            configuration below and enable the App Embed in your theme editor.
+            To display WhatsApp widget on your storefront, please enable the App
+            Embed & complete the configuration below and in your theme editor.
           </Typography>
           <Button
             variant="contained"
@@ -251,6 +314,131 @@ export default function WhatsAppSettingsDesign({
           <Box
             sx={{ flex: 1, marginTop: { xs: "5px", md: "5px" }, minWidth: 0 }}
           >
+            {/* Phone Number Section */}
+            <Box mb={{ xs: 3, md: 4 }}>
+              <Typography
+                variant="h2"
+                sx={{ fontSize: "14px" }}
+                fontWeight={600}
+                mb={0.5}
+              >
+                Phone Number
+              </Typography>
+              <Typography
+                variant="subtitle2"
+                sx={{ fontSize: "13px" }}
+                fontWeight={450}
+                color="textSecondary"
+                mb={3}
+              >
+                <p>Configure the WhatsApp number for your button.</p>
+              </Typography>
+
+              <Card sx={{ mb: 3, borderRadius: "10px" }}>
+                <CardContent>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      gap: 1,
+                      alignItems: "flex-start",
+                      flexDirection: { xs: "column", sm: "row" },
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        width: { xs: "100%", sm: "fit-content" },
+                        flexShrink: 0,
+                      }}
+                    >
+                      <Typography
+                        variant="h2"
+                        sx={{ fontSize: "14px", paddingBottom: "5px" }}
+                        fontWeight={600}
+                        mb={1}
+                      >
+                        Country Code
+                      </Typography>
+                      <CountryCodeSelect
+                        value={form.country_code}
+                        onChange={(code) => {
+                          setForm((prev) => ({ ...prev, country_code: code }));
+                          if (formErrors.country_code) {
+                            setFormErrors((prev) => ({
+                              ...prev,
+                              country_code: "",
+                            }));
+                          }
+                        }}
+                        error={!!formErrors.country_code}
+                      />
+                      {formErrors.country_code && (
+                        <Typography
+                          variant="caption"
+                          color="error"
+                          sx={{ mt: 0.5, display: "block", fontSize: "10px" }}
+                        >
+                          {formErrors.country_code}
+                        </Typography>
+                      )}
+                    </Box>
+                    <Box sx={{ flex: 1, width: "100%" }}>
+                      <Typography
+                        variant="h2"
+                        sx={{ fontSize: "14px", paddingBottom: "5px" }}
+                        fontWeight={600}
+                        mb={1}
+                      >
+                        Your Number
+                      </Typography>
+                      <TextField
+                        fullWidth
+                        value={form.phone_number}
+                        onChange={(e) => {
+                          setForm((prev) => ({
+                            ...prev,
+                            phone_number: e.target.value,
+                          }));
+                          if (formErrors.phone_number) {
+                            setFormErrors((prev) => ({
+                              ...prev,
+                              phone_number: "",
+                            }));
+                          }
+                        }}
+                        placeholder="e.g. 8265683421"
+                        type="text"
+                        error={!!formErrors.phone_number}
+                        helperText={
+                          formErrors.phone_number
+                            ? formErrors.phone_number
+                            : 'No leading "+", for example: 1234567890.'
+                        }
+                        inputProps={{ maxLength: 15 }}
+                        InputProps={{
+                          endAdornment: (
+                            <InputAdornment position="end">
+                              <Typography
+                                variant="caption"
+                                color="textSecondary"
+                              >
+                                {form.phone_number?.length || 0}/15
+                              </Typography>
+                            </InputAdornment>
+                          ),
+                        }}
+                        sx={{
+                          height: "56px",
+                          "& .MuiOutlinedInput-root": {
+                            fontSize: { xs: "14px", sm: "inherit" },
+                          },
+                        }}
+                      />
+                    </Box>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Box>
+
             {/* General Section */}
             <Box mb={{ xs: 3, md: 4 }}>
               <Typography
@@ -327,6 +515,92 @@ export default function WhatsAppSettingsDesign({
                 onChange={setTempButtonStyle}
                 getIconSrc={getIconSrc}
               />
+
+              {/* Page Display Selection */}
+              <Card sx={{ mb: 3, borderRadius: "10px" }}>
+                <CardContent>
+                  <Box>
+                    <Typography
+                      variant="h2"
+                      sx={{ fontSize: "14px" }}
+                      fontWeight={600}
+                      mb={1}
+                    >
+                      Display On Pages
+                    </Typography>
+                    <Typography
+                      variant="subtitle2"
+                      sx={{ fontSize: "13px" }}
+                      fontWeight={450}
+                      color="textSecondary"
+                      mb={2}
+                    >
+                      Select which pages to display the WhatsApp widget on.
+                    </Typography>
+                    <FormControl fullWidth size="small">
+                      <InputLabel id="page-display-label">
+                        Display On
+                      </InputLabel>
+                      <Select
+                        labelId="page-display-label"
+                        id="page-display-select"
+                        multiple
+                        value={tempPageDisplay}
+                        label="Display On"
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          // If "all" is selected, replace everything with just "all"
+                          if (value.includes("all")) {
+                            setTempPageDisplay(["all"]);
+                          } else {
+                            setTempPageDisplay(
+                              typeof value === "string"
+                                ? value.split(",")
+                                : value,
+                            );
+                          }
+                        }}
+                        input={<OutlinedInput label="Display On" />}
+                        renderValue={(selected) => {
+                          if (selected.includes("all")) {
+                            return "All Pages";
+                          }
+                          return selected.join(", ");
+                        }}
+                      >
+                        <MenuItem value="all">
+                          <Checkbox checked={tempPageDisplay.includes("all")} />
+                          <ListItemText primary="All Pages" />
+                        </MenuItem>
+                        <MenuItem value="home">
+                          <Checkbox
+                            checked={tempPageDisplay.includes("home")}
+                          />
+                          <ListItemText primary="Home Page" />
+                        </MenuItem>
+                        <MenuItem value="products">
+                          <Checkbox
+                            checked={tempPageDisplay.includes("products")}
+                          />
+                          <ListItemText primary="Product Page" />
+                        </MenuItem>
+                        <MenuItem value="catalog">
+                          <Checkbox
+                            checked={tempPageDisplay.includes("catalog")}
+                          />
+                          <ListItemText primary="Collection Page" />
+                        </MenuItem>
+                        <MenuItem value="contact">
+                          <Checkbox
+                            checked={tempPageDisplay.includes("contact")}
+                          />
+                          <ListItemText primary="Contact Page" />
+                        </MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Box>
+                </CardContent>
+              </Card>
             </Box>
 
             <Box display="flex" mt={3}>
@@ -336,7 +610,9 @@ export default function WhatsAppSettingsDesign({
                 onClick={handleUpdateSettings}
                 disabled={settingsLoading}
                 startIcon={
-                  settingsLoading ? <CircularProgress size={20} /> : null
+                  settingsLoading ? (
+                    <CircularProgress size={20} color="inherit" />
+                  ) : null
                 }
                 sx={{
                   textTransform: "none",
